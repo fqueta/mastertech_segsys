@@ -36,7 +36,7 @@ class MenuSeeder extends Seeder
             ],
             [
                 'categoria'=>'',
-                'description'=>'Clientes',
+                'description'=>'Todos Clientes',
                 'icon'=>'fas fa-user',
                 'actived'=>true,
                 'url'=>'clientes',
@@ -45,40 +45,13 @@ class MenuSeeder extends Seeder
             ],
             [
                 'categoria'=>'',
-                'description'=>'Contratos',
+                'description'=>'Importar Clientes',
                 'icon'=>'fas fa-file',
                 'actived'=>true,
-                'url'=>'contratos',
-                'route'=>'contratos.index',
+                'url'=>'import_clientes',
+                'route'=>'clientes.import',
                 'pai'=>'cad-clientes'
             ],
-            // [
-            //     'categoria'=>'',
-            //     'description'=>'Orçamentos',
-            //     'icon'=>'fas fa-file-excel',
-            //     'actived'=>true,
-            //     'url'=>'cad-orcamentos',
-            //     'route'=>'',
-            //     'pai'=>''
-            // ],
-            // [
-            //     'categoria'=>'',
-            //     'description'=>'Novo orçamento',
-            //     'icon'=>'fas fa-plus',
-            //     'actived'=>true,
-            //     'url'=>'orcamento',
-            //     'route'=>'orcamentos.create',
-            //     'pai'=>'cad-orcamentos'
-            // ],
-            // [
-            //     'categoria'=>'',
-            //     'description'=>'Todos Orçamentos',
-            //     'icon'=>'fas fa-list',
-            //     'actived'=>true,
-            //     'url'=>'orcamentos',
-            //     'route'=>'orcamentos.index',
-            //     'pai'=>'cad-orcamentos'
-            // ],
             [
                 'categoria'=>'SITE',
                 'description'=>'Gerenciar site',

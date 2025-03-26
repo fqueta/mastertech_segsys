@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\admin\AttachmentsController;
+use App\Http\Controllers\admin\ClienteController;
 use App\Http\Controllers\admin\ConfigController;
 use App\Http\Controllers\admin\FinanceiroController;
 use App\Http\Controllers\admin\HomeController;
@@ -205,6 +206,7 @@ Route::middleware([
         Route::resource('/clientes', '\App\Http\Controllers\admin\ClienteController',['parameters' => [
             'clientes' => 'id'
         ]]);
+        Route::get('/clientes/importar',[ClienteController::class,'importar'])->name('clientes.import');
         Route::resource('/contratos', '\App\Http\Controllers\admin\PostsController',['parameters' => [
             'contratos' => 'id'
         ]]);

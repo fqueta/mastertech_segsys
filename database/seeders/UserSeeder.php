@@ -27,21 +27,21 @@ class UserSeeder extends Seeder
                 'id_permission' => '1',
             ],
             [
-                'name' => 'Usuario de teste',
-                'email' => 'teste@databrasil.app.br',
+                'name' => 'Wellington Santos',
+                'email' => 'mastertechjf@gmail.com',
                 'password' => Hash::make('mudar123'),
                 'status' => 'actived',
                 'verificado' => 'n',
                 'id_permission' => '2',
             ],
-            [
-                'name' => 'Usuario de teste front',
-                'email' => 'ger.maisaqui1@gmail.com',
-                'password' => Hash::make('mudar123'),
-                'status' => 'actived',
-                'verificado' => 'n',
-                'id_permission' => '5',
-            ],
+            // [
+            //     'name' => 'Usuario de teste front',
+            //     'email' => 'ger.maisaqui1@gmail.com',
+            //     'password' => Hash::make('mudar123'),
+            //     'status' => 'actived',
+            //     'verificado' => 'n',
+            //     'id_permission' => '5',
+            // ],
         ];
         User::truncate();
         Contrato::truncate();

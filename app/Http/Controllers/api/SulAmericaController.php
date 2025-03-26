@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\admin\ContratoController;
 use App\Http\Controllers\Controller;
+use App\Qlib\Qlib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -15,9 +16,9 @@ class SulAmericaController extends Controller
     public function __construct()
     {
         // $this->url = "https://services.sulamerica.com.br/saude/autorizacao"; // URL do WebService da SulAmérica
-        $this->url = "https://canalvenda-internet-develop.executivoslab.com.br/services/canalvenda?wsdl"; // URL do WebService da SulAmérica
-        $this->user = "yello1232user";
-        $this->pass = "yello1232pass";
+        $this->url = Qlib::qoption('url_api_sulamerica') ? Qlib::qoption('url_api_sulamerica') : "https://canalvenda-internet-develop.executivoslab.com.br/services/canalvenda?wsdl"; // URL do WebService da SulAmérica
+        $this->user = Qlib::qoption('user_api_sulamerica') ? Qlib::qoption('user_api_sulamerica') : "yello1232user";
+        $this->pass = Qlib::qoption('pass_api_sulamerica') ? Qlib::qoption('pass_api_sulamerica') : "yello1232pass";
     }
     /**
      * Metodo para ser chamado na api do ajax
