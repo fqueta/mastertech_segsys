@@ -159,28 +159,6 @@ Route::middleware([
             Route::post('/trash',['\App\Http\Controllers\admin\mediaController','trash'])->name('trash.media');
             // Route::get('/ajax',[App\Http\Controllers\TesteController::class,'ajax'])->name('teste.ajax');
         });
-
-
-        // Route::resource('/users', 'UsersController', ['except' => ['show']]);
-        // Route::resource('/players', 'PlayersController', ['except' => ['show']]);
-        // Route::resource('/players/order', 'PlayersController@postSort');
-        // Route::resource('/banners', 'BannersController', ['except' => ['show']]);
-        // Route::resource('/banners/order', 'BannersController@postSort');
-        // Route::resource('/floaters', 'FloatersController', ['except' => ['show']]);
-        // Route::resource('/floaters/order', 'FloatersController@postSort');
-        // Route::resource('/pages', 'PagesController', ['except' => ['show']]);
-        // Route::resource('/pages/order', 'PagesController@postSort');
-        // Route::resource('pages.subpages', 'SubpagesController', ['except' => 'show']);
-        // Route::resource('/receivers', 'ReceiversController', ['except' => ['show']]);
-        // Route::resource('/contacts', 'ContactsController', ['except' => ['show']]);
-        // Route::resource('/sections', 'SectionsController', ['except' => ['show']]);
-
-        // Route::resource('/biddings', '\App\Http\Controllers\admin\BiddingsController', ['except' => ['show'],'parameters'=>[
-        //     'biddings' => 'id'
-        // ]]);
-        // Route::resource('/attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show'],'parameters'=>[
-        //     'attachments' => 'id'
-        // ]]);
         Route::prefix('/financeiro')->group(function(){
             Route::resource('receitas', '\App\Http\Controllers\admin\FinanceiroController', ['parameters'=>[
                 'receitas' => 'id'
@@ -195,30 +173,7 @@ Route::middleware([
             Route::get('despesas', [FinanceiroController::class,'despesas'])->name('financeiro.despesas');
             Route::get('extrato', [FinanceiroController::class,'extrato'])->name('financeiro.extrato');
         });
-        // Route::resource('biddings.notifications', '\App\Http\Controllers\admin\NotificationsController', ['except' => ['show']]);
-        // Route::resource('biddings.newsletters', '\App\Http\Controllers\admin\BiddingNewslettersController', ['except' => ['show']]);
-        // Route::resource('/biddings/{parent_id}/attachments/order','\App\Http\Controllers\admin\AttachmentsController@postSort');
 
-        // Route::resource('/b_trimestrals', 'B_trimestralsController', ['except' => ['show']]);
-        // Route::resource('/attachments', 'A_trimestralsController', ['except' => ['show']]);
-        // Route::resource('b_trimestrals.attachments', 'A_trimestralsController', ['except' => ['show']]);
-        // Route::resource('b_trimestrals.notifications', 'NotificationsController', ['except' => ['show']]);
-        // Route::resource('b_trimestrals.newsletters', 'BiddingNewslettersController', ['except' => ['show']]);
-        // Route::resource('/b_trimestrals/{parent_id}/attachments/order', 'A_trimestralsController@postSort');
-
-        // Route::resource('/file_uploads', 'UploadsController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
-        // Route::resource('/categories', 'CategoriesController', ['except' => ['show']]);
-        // Route::resource('/categories/order', 'CategoriesController@postSort');
-        // Route::resource('/biddings_categories', '\App\Http\Controllers\admin\BiddingCategoriesController', ['except' => ['show'],'parameters'=>[
-        //     'biddings_categories' => 'id'
-        // ]]);
-        // Route::resource('/biddings_categories/order', 'BiddingCategoriesController@postSort');
-        // Route::resource('/posts', 'PostsController', ['except' => ['show']]);
-        // Route::resource('/notices', 'NoticesController', ['except' => ['show']]);
-        // Route::resource('/newsletters', 'NewslettersController', ['except' => ['show']]);
-        // Route::resource('/posts/order', 'PostsController@postSort');
-        // Route::resource('/diaries', 'DiariesController', ['except' => ['show']]);
-        // Route::resource('/docs', 'docsController', ['except' => ['show']]);
         Route::get('/test', [TesteController::class,'index']);
         // Route::resource('/docfile', '\App\Http\Controllers\admin\DocfileController',['parameters' => [
         //     'docfile' => 'id'

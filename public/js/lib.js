@@ -2168,19 +2168,22 @@ function exibeTpc(val){
         $('.tpc-a').show();
     }
 }
-function cancelarSulamerica(obj){
+function cancelarSulamerica(token,id,obj){
     var no = obj.getAttribute('data-operacao');
-    var token_contrato = obj.getAttribute('data-token_contrato');
+    // var token_contrato = obj.getAttribute('data-token_contrato');
+    if(!window.confirm('DESEJA PROSSEGUIR COM O CANCELAMENTO?')){
+        return;
+    }
     try {
         getAjax({
-            url:'/admin/ajax/chage_status',
+            url:'/api/v1/cancelar',
             type: 'POST',
             dataType: 'json',
             csrf: true,
             data:{
                 id: id,
                 numeroOperacao: no,
-                token_contrato: token_contrato
+                token_contrato: token
             }
         },function(res){
             $('#preload').fadeOut("fast");

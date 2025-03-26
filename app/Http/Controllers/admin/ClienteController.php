@@ -252,7 +252,7 @@ class ClienteController extends Controller
                 'cp_busca'=>'config][tipo_pj','class_div'=>'div-pj '.$displayPj,
             ],
             'sep1'=>['label'=>'Endereço','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>'],
-            'config[cep]'=>['label'=>'CEP','active'=>false,'placeholder'=>'','type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cep onchange=buscaCep1_0(this.value)','tam'=>'3','title'=>'Se informar o CEP o endereço será preenchido automaticamente'],
+            'config[cep]'=>['label'=>'CEP','active'=>false,'placeholder'=>'','type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cep onchange=buscaCep1_0(this.value)','tam'=>'3','title'=>'Se informar o CEP o endereço será preenchido automaticamente','cp_busca'=>'config][cep'],
             'config[endereco]'=>['label'=>'Endereço','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'endereco=cep q-inp="endereco"','tam'=>'7','cp_busca'=>'config][endereco'],
             'config[numero]'=>['label'=>'Numero','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'numero=cep','tam'=>'2','cp_busca'=>'config][numero'],
             'config[complemento]'=>['label'=>'Complemento','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','cp_busca'=>'config][complemento'],
@@ -516,6 +516,7 @@ class ClienteController extends Controller
         ];
         //Adicionar um contrato caso o cliente foi salvo com sucesso
         if($ret['idCad'] && ($id_cliente = $ret['idCad']) && isset($dados['config']['id_produto'])){
+           $dados['config']['token'] = isset($dados['token']) ? $dados['token'] : false;
            $ret = $this->store_contratos($id_cliente,$dados['config']);
         }
 
@@ -553,7 +554,7 @@ class ClienteController extends Controller
             'fim'=>$fim,
         ];
         if($ac=='cad'){
-            $dsalv['token'] = uniqid();
+            $dsalv['token'] = isset($dados['token']) ? $dados['token'] : uniqid();
             $dsalv['created_at'] = Qlib::dataBanco();
         }else{
             $dsalv['updated_at'] = Qlib::dataBanco();

@@ -97,23 +97,59 @@ class ContratoController extends Controller
                     $salvar3 = Qlib::update_usermeta($id_cliente,$campo_meta3,$status_aprovdo);
                     //salvar no campo config da tabela users
                     $salv_json_fiels = Qlib::update_json_fields('users','id',$id_cliente,'config',$campo_meta2,$numOperacao);
-                    $salv_json_fiels = Qlib::update_json_fields('users','id',$id_cliente,'config',$campo_meta3,$status_aprovdo);
-
+                    // $salv_json_fiels = Qlib::update_json_fields('users','id',$id_cliente,'config',$campo_meta3,$status_aprovdo);
+                    $update_status = $this->status_update($token,$status_aprovdo,$ret);
                     if( Qlib::isAdmin(1)){
                         $ret['config'] = $config;
                         $ret['salvar'] = $salvar;
                         $ret['salvar2'] = $salvar2;
                         $ret['salv_json_fiels'] = $salv_json_fiels;
-                        // $ret['salvar_contrado'] = $salvar_contrado;
-                        $ret['dc'] = $dc;
+                        $ret['update_status'] = $update_status;
+                        // $ret['dc'] = $dc;
                     }
                 }
-                $salvar_contrado = Qlib::update_tab('contratos',[
-                    'config'=>Qlib::lib_array_json($ret['data']),
-                ],"WHERE token='$token'");
+                // $salvar_contrado = Qlib::update_tab('contratos',[
+                //     'config'=>Qlib::lib_array_json($ret['data']),
+                // ],"WHERE token='$token'");
             }
         }
         return $ret;
+    }
+    /**
+     * Atualiza o status de um contrato
+     * @param string $token_contrato é o token de um contrato
+     * @param string $status é o status a atual do contrato 'Aprovado' | 'Cancelado'
+     * @param array resultado do processamento que gerou o status.
+     */
+    public function status_update($token_contrato,$status,$ret=[]){
+        $campo_meta1 = $this->campo_meta1;
+        $campo_meta2 = $this->campo_meta2;
+        $campo_meta3 = $this->campo_meta3;
+        $dc = $this->dc($token_contrato);
+        try {
+            if(isset($dc['id']) && ($id_cliente=$dc['id']) && isset($ret['data'])){
+                $salvar_contrado = Qlib::update_tab('contratos',[
+                    'config'=>Qlib::lib_array_json($ret['data']),
+                ],"WHERE token='$token_contrato'");
+                $salvar3 = Qlib::update_usermeta($id_cliente,$campo_meta3,$status);
+                $salv_json_fiels = Qlib::update_json_fields('users','id',$id_cliente,'config',$campo_meta3,$status);
+                if( Qlib::isAdmin(1)){
+                    // $ret['config'] = $config;
+                    // $ret['salvar'] = $salvar;
+                    // $ret['salvar2'] = $salvar2;
+                    $ret['salv_json_fiels'] = $salv_json_fiels;
+                    // $ret['salvar_contrado'] = $salvar_contrado;
+                    $ret['dc'] = $dc;
+                }
+            }
+            $ret['exec'] = true;
+            $ret['mens'] = 'Status atualização com sucesso!';
+        } catch (\Throwable $th) {
+            $ret['exec'] = false;
+            $ret['mens'] = 'Erro ao atualizar o status!';
+            $ret['error'] = $th->getMessage();
+            //throw $th;
+        }
     }
     /**
      * Display a listing of the resource.

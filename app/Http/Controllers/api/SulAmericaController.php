@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Http\Controllers\admin\ContratoController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -148,6 +149,7 @@ class SulAmericaController extends Controller
         $numeroOperacao = isset($config['numeroOperacao']) ? $config['numeroOperacao'] : '740434';
         $canalVenda = isset($config['canalVenda']) ? $config['canalVenda'] : 'site';
         $mesAnoFatura = isset($config['mesAnoFatura']) ? $config['mesAnoFatura'] : '032025';
+        $token_contrato = isset($config['token_contrato']) ? $config['token_contrato'] : '';
         $xml = '
         <soapenv:Envelope
             xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -181,6 +183,10 @@ class SulAmericaController extends Controller
         // $ret['passwordDigest'] = $passwordDigest;
         $ret['body'] = $resposta;
         $ret = $this->xmlCancela_to_array($resposta);
+        if(isset($ret['exec']) && !empty($token_contrato)){
+            //Atualizar o status do contrato
+            (new ContratoController)->status_update($token_contrato,'Cancelado',$ret);
+        }
         return $ret; // Retorna a resposta do WebService
     }
     public function formaResposta($xml){
@@ -244,6 +250,7 @@ class SulAmericaController extends Controller
         $ret['exec'] = false;
         $ret['data'] = [];
         $ret['mens'] = '';
+        $ret['color'] = 'danger';
 
         // Verificar se o nó foi encontrado
         if (!empty($confirmarCancelamento)) {
@@ -260,9 +267,14 @@ class SulAmericaController extends Controller
             $array = json_decode(json_encode($innerXmlObject), true);
 
             // Exibir resultado
-            $ret['exec'] = true;
-            $ret['data'] = $array;
-            $ret['mens'] = isset($array['retornoMsg']) ? $array['retornoMsg'] : '';
+            if(isset($array['retorno']) && $array['retorno']=='0'){
+                $ret['exec'] = true;
+                $ret['data'] = $array;
+                $ret['mens'] = isset($array['retornoMsg']) ? $array['retornoMsg'] : 'Cancelado com sucesso!';
+                $ret['color'] = 'success';
+            }else{
+                $ret['mens'] = isset($array['retornoMsg']) ? $array['retornoMsg'] : 'Erro ao cancelar!';
+            }
         } else {
             // $ret['data'] = $array;
             $ret['mens'] = "Erro: O nó ns2:contratarSeguro não foi encontrado!";
