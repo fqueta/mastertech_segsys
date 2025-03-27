@@ -83,6 +83,8 @@ class UserController extends Controller
             if($this->routa == 'fornecedores'){
                 $user =  User::where('id_permission','=',Qlib::qoption('id_permission_fornecedores'))->orderBy('id',$config['order']);
             }else{
+                // $id_permission_clientes = Qlib::qoption('id_permission_clientes');
+                // if()
                 $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
             }
             //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);

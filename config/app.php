@@ -15,10 +15,10 @@ return [
     */
 
     'name' => env('APP_NAME', 'SEGSYS'),
-    'dominio' => 'https://ctloja.com.br/',
+    'dominio' => 'https://maisaqui.com.br/',
     'version' => '1.0.0.1',
     'id_app' => env('ID_APP', 'segsys'),
-    'last_update' => '21/03/2025',
+    'last_update' => '27/03/2025',
 
     /*
     |--------------------------------------------------------------------------

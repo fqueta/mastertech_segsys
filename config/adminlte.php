@@ -45,13 +45,14 @@ $config = [
     |
     */
 
-    'logo' => '<img class="d-none" src="/vendor/adminlte/dist/img/logo1.png"/>',
-    'logo_img' => 'vendor/adminlte/dist/img/logo2.png',
-    //'logo_img' => 'vendor/adminlte/dist/img/logo.jpeg',
+    // 'logo' => '<img class="d-none" src="/vendor/adminlte/dist/img/logo1.png"/>',
+    'logo' => '<img class="d-none" src="/vendor/adminlte/dist/img/logo1.jpg"/>',
+    // 'logo_img' => 'vendor/adminlte/dist/img/logo2.png',
+    'logo_img' => 'vendor/adminlte/dist/img/logo2.jpg',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'ams',
+    'logo_img_alt' => 'segsys',
 
     /*
     |--------------------------------------------------------------------------
@@ -148,7 +149,7 @@ $config = [
 
     'sidebar_mini' => 'lg',
     'sidebar_collapse' => true,
-    'sidebar_collapse_auto_size' => false,
+    'sidebar_collapse_auto_size' => true,
     'sidebar_collapse_remember' => true,
     'sidebar_collapse_remember_no_transition' => true,
     'sidebar_scrollbar_theme' => 'os-theme-light',
