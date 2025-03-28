@@ -2188,7 +2188,7 @@ function cancelarSulamerica(token,id,obj){
         },function(res){
             $('#preload').fadeOut("fast");
             lib_formatMensagem('.mens',res.mens,res.color);
-
+            dps_cancela(res);
         },function(err){
             $('#preload').fadeOut("fast");
             console.log(err);
@@ -2197,5 +2197,13 @@ function cancelarSulamerica(token,id,obj){
 
     }
     if(no){
+    }
+}
+//executado depos do cancelamento
+function dps_cancela(res){
+    if(res.exec){
+        document.querySelector('[btn-volter="true"]').click();
+        $('[btn="permanecer"]').hide();
+        $('[btn="sair"]').hide();
     }
 }
