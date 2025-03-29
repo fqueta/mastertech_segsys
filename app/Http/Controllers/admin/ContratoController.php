@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\api\SulAmericaController;
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
+use App\Models\User;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
 
@@ -122,25 +123,26 @@ class ContratoController extends Controller
      * @param array resultado do processamento que gerou o status.
      */
     public function status_update($token_contrato,$status,$ret=[]){
-        $campo_meta1 = $this->campo_meta1;
-        $campo_meta2 = $this->campo_meta2;
-        $campo_meta3 = $this->campo_meta3;
         $dc = $this->dc($token_contrato);
+        $ret = ['exec'=>false,'mens'=>'','color'=>'danger'];
         try {
-            if(isset($dc['id']) && ($id_cliente=$dc['id']) && isset($ret['data'])){
-                $salvar_contrado = Qlib::update_tab('contratos',[
-                    'config'=>Qlib::lib_array_json($ret['data']),
-                ],"WHERE token='$token_contrato'");
-                $salvar3 = Qlib::update_usermeta($id_cliente,$campo_meta3,$status);
-                $salv_json_fiels = Qlib::update_json_fields('users','id',$id_cliente,'config',$campo_meta3,$status);
+            if(isset($dc['id']) && ($id_cliente=$dc['id'])){
+                $salvar3 = Qlib::update_usermeta($id_cliente,$this->campo_meta3,$status);
+                $salv_json_fiels = Qlib::update_json_fields('users','id',$id_cliente,'config',$this->campo_meta3,$status);
                 if( Qlib::isAdmin(1)){
                     // $ret['config'] = $config;
                     // $ret['salvar'] = $salvar;
-                    // $ret['salvar2'] = $salvar2;
+                    $ret['salvar3'] = $salvar3;
                     $ret['salv_json_fiels'] = $salv_json_fiels;
                     // $ret['salvar_contrado'] = $salvar_contrado;
                     $ret['dc'] = $dc;
                 }
+            }
+            if(isset($ret['data'])){
+                $salvar_contrado = Qlib::update_tab('contratos',[
+                    'config'=>Qlib::lib_array_json($ret['data']),
+                ],"WHERE token='$token_contrato'");
+
             }
             $ret['exec'] = true;
             $ret['mens'] = 'Status atualização com sucesso!';
@@ -150,6 +152,46 @@ class ContratoController extends Controller
             $ret['error'] = $th->getMessage();
             //throw $th;
         }
+        return $ret;
+    }
+    /**
+     * Atualiza o token para um novo, e tambem remove o numero de operação antigo para que um contrato seja reativado na sulamerica
+     */
+    public function reativar($token){
+        $new_token = uniqid();
+        $ret['exec'] = false;
+        $ret['color'] = 'danger';
+        $ret['mens'] = __('Erro ao iniciar o precesso de reativação');
+        $up_contrato = Contrato::where('token','=',$token)->update(['token'=>$new_token]);
+        $up_user = User::where('token','=',$token)->update(['token'=>$new_token]);
+        if(Qlib::isAdmin(1)){
+            $ret['up_contrato'] = $up_contrato;
+            $ret['up_user'] = $up_user;
+        }
+        if($up_contrato && $up_user){
+            $dc = $this->dc($new_token);
+            $status = 'Reativando';
+            $delete1 = false;
+            $update_status = false;
+            $salv_json_fiels = false;
+            if(isset($dc['id']) && ($user_id=$dc['id'])){
+                $delete1 = Qlib::delete_usermeta($user_id,$this->campo_meta2);
+                $salv_json_fiels = Qlib::update_json_fields('users','id',$user_id,'config',$this->campo_meta2,'');
+                $update_status = $this->status_update($new_token,$status,[]);
+                $ret['dc'] = $dc;
+                $ret['mens'] = __('Retivação inciada com sucesso!!');
+                $ret['color'] = 'success';
+            }
+            $ret['delete1'] = $delete1;
+            $ret['salv_json_fiels'] = $salv_json_fiels;
+            $ret['exec'] = true;
+            $ret['update_status'] = $update_status;
+            $ret['old_token'] = $token;
+            $ret['new_token'] = $new_token;
+        }
+        return $ret;
+
+        // $token = Qlib::buscaValorDb0('users','token',$id,'token');
     }
     /**
      * Display a listing of the resource.

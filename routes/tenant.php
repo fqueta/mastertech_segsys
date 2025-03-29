@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\ClienteController;
 use App\Http\Controllers\admin\ConfigController;
+use App\Http\Controllers\admin\ContratoController;
 use App\Http\Controllers\admin\FinanceiroController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\api\AuthController;
@@ -147,6 +148,8 @@ Route::middleware([
         Route::prefix('ajax')->group(function(){
             Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.update-ajax');
             Route::post('/chage_status',[ConfigController::class,'chage_status'])->name('chage_status');
+            Route::post('/cliente/reativar/{token}',[ContratoController::class,'reativar'])->name('cliente.reativar');
+            Route::post('/cliente/cancelar/{token}',[ContratoController::class,'cancelar'])->name('cliente.cancelar');
             // Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.destroy-ajax');
         });
         Route::fallback(function () {

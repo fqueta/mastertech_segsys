@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\admin\AttachmentsController;
+use App\Http\Controllers\admin\ContratoController;
 use App\Http\Controllers\admin\PostsController;
 use App\Http\Controllers\admin\UserPermissions;
 use App\Http\Controllers\api\SulAmericaController;
@@ -27,32 +28,35 @@ class TesteController extends Controller
     public function index(Request $request)
     {
 
-        $type = $request->get('type');
-        $ret = false;
-        if($type=='contratacao'){
-            $numero = $request->get('numero') ? $request->get('numero') : 6;
-            $config = [
-                'plano'=>1,
-                'operacaoParceiro'=>Qlib::zerofill($numero,5),
-                'nomeSegurado'=>'Programdor teste',
-                'dataNascimento'=>'1989-06-05',
-                'sexo'=>'F',
-                'uf'=>'MG',
-                'documento'=>'12345678909',
-                'inicioVigencia'=>'2025-03-25',
-                'fimVigencia'=>'2026-03-25',
-            ];
-            $ret = (new SulAmericaController)->contratacao($config);
-        }
-        if($type=='cancela'){
-            $config = [
-                'numeroOperacao'=>'740442',
-            ];
-            $ret = (new SulAmericaController)->cancelamento($config);
-        }
-        if($type=='update'){
-            $ret = Qlib::update_json_fields($tab='users',$campos_bus='id',$valor_bus='3',$f_tab='config',$f_json='numOperacao',$value='3333');
-        }
+        // $type = $request->get('type');
+        // $ret = false;
+        // if($type=='contratacao'){
+        //     $numero = $request->get('numero') ? $request->get('numero') : 6;
+        //     $config = [
+        //         'plano'=>1,
+        //         'operacaoParceiro'=>Qlib::zerofill($numero,5),
+        //         'nomeSegurado'=>'Programdor teste',
+        //         'dataNascimento'=>'1989-06-05',
+        //         'sexo'=>'F',
+        //         'uf'=>'MG',
+        //         'documento'=>'12345678909',
+        //         'inicioVigencia'=>'2025-03-25',
+        //         'fimVigencia'=>'2026-03-25',
+        //     ];
+        //     $ret = (new SulAmericaController)->contratacao($config);
+        // }
+        // if($type=='cancela'){
+        //     $config = [
+        //         'numeroOperacao'=>'740442',
+        //     ];
+        //     $ret = (new SulAmericaController)->cancelamento($config);
+        // }
+        // if($type=='update'){
+        //     $ret = Qlib::update_json_fields($tab='users',$campos_bus='id',$valor_bus='3',$f_tab='config',$f_json='numOperacao',$value='3333');
+        // }
+        $token = $request->get('token');
+        $ret = (new ContratoController)->status_update($token,'Reativando',[]);
+        // $ret = (new ContratoController)->update_token($token);
         return $ret;
         // return view('teste',$config);
     }

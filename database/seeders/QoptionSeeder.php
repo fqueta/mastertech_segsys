@@ -53,6 +53,12 @@ class QoptionSeeder extends Seeder
                 'valor'=>'6',
                 'obs'=>'',
             ],
+            [
+                'nome'=>'Mensagem de alerta de reativação de clientes',
+                'url'=>'alerta_processo_reativacao',
+                'valor'=>'Cliente em processo de reativação, por favor confira as informações de cadastro e clique em salvar para continuar',
+                'obs'=>'',
+            ],
             // [
             //     'nome'=>'Editor padrão',
             //     'url'=>'editor_padrao',

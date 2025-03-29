@@ -2194,10 +2194,9 @@ function cancelarSulamerica(token,id,obj){
             console.log(err);
         });
     } catch (error) {
+        console.log(error);
+    }
 
-    }
-    if(no){
-    }
 }
 //executado depos do cancelamento
 function dps_cancela(res){
@@ -2205,5 +2204,42 @@ function dps_cancela(res){
         document.querySelector('[btn-volter="true"]').click();
         $('[btn="permanecer"]').hide();
         $('[btn="sair"]').hide();
+    }
+}
+function reativar_cadastro(token,link_a){
+    if (typeof link_a=='undefined') {
+        alert('Id não informado')
+        return
+    }
+    if(!window.confirm('DESEJA INICIAR O PRECESSO DE REATIVAÇÃO?')){
+        return;
+    }
+    try {
+        getAjax({
+            url:'/admin/ajax/cliente/reativar/'+token,
+            type: 'POST',
+            dataType: 'json',
+            csrf: true,
+            data:{
+                token: token
+            }
+        },function(res){
+            $('#preload').fadeOut("fast");
+            lib_formatMensagem('.mens',res.mens,res.color);
+            dps_reativa(res,link_a);
+        },function(err){
+            $('#preload').fadeOut("fast");
+            console.log(err);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+function dps_reativa(res,link){
+    if(res.exec){
+        if(link){
+            window.location = link+'&bc=false';
+            // alert(link);
+        }
     }
 }

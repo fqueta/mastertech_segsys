@@ -76,5 +76,5 @@
         });
 
     </script>
-    @include('qlib.js_submit')
+    @include('clientes.js_submit')
 @stop

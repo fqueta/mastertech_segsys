@@ -146,6 +146,18 @@ class ClienteController extends Controller
         ];
         return $ret;
     }
+    /**
+     * Retorna o status de um contrato
+     */
+    public function get_status_contrato($id){
+        return Qlib::get_usermeta($id,(new ContratoController)->campo_meta3,true);
+    }
+    /**
+     * Retorna o numero de operação
+     */
+    public function get_numero_operacao($id){
+        return Qlib::get_usermeta($id,(new ContratoController)->campo_meta2,true);
+    }
     public function campos($dados=false,$local='index'){
         $user = Auth::user();
         // $permission = new admin\UserPermissions($user);
@@ -179,6 +191,17 @@ class ClienteController extends Controller
         }
         // $hidden_editor = '';
         $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
+        if(isset($dados['id']) && ($id_cliente=$dados['id'])){
+            $status = $this->get_status_contrato($id_cliente);
+            if($status == 'Reativando'){
+                $alerta_processo_reativacao = Qlib::qoption('alerta_processo_reativacao') ? Qlib::qoption('alerta_processo_reativacao') : '';
+                if($alerta_processo_reativacao){
+                    $alerta_processo_reativacao = __($alerta_processo_reativacao);
+                }
+                $info_obs .= '<div class="alert alert-warning alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button>'.$alerta_processo_reativacao.'</div>';
+
+            }
+        }
         $id_produto_padrao = '10232'; //unico produto padrão que pode ser contratado pela sulameriaca
         $ret = [
             'sep2'=>['label'=>'info','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>$info_obs,'script_show'=>''],
@@ -310,6 +333,8 @@ class ClienteController extends Controller
                     //carregar os dados para motar o painel que servirá visutalização de status e para cancelamento
                     $ret['painelsulamerica']['dados'][$campo_meta2] = $numOperacao;
                     $ret['painelsulamerica']['dados'][$campo_meta3] = $status_aprovado;
+                    // dump($status_aprovado,$ret);
+
                 }
             }
             if(isset($dados['preferencias'])){
@@ -570,6 +595,8 @@ class ClienteController extends Controller
                 if(isset($sulamerica_contratar['exec'])){
                     //é por que teve interação com a API de integração nesse caso deve retornar o status da api
                     $ret = $sulamerica_contratar;
+                    $ret['status_contrato'] = $this->get_status_contrato($id_cliente);
+                    $ret['numero_operacao'] = $this->get_numero_operacao($id_cliente);
                 }
             }
         }
@@ -696,6 +723,7 @@ class ClienteController extends Controller
                 'ac'=>'alt',
                 'frm_id'=>'frm-users',
                 'route'=>$this->routa,
+                // 'status_contrato'=>$this->get_status_contrato($id),
                 'url'=>$this->url,
                 'id'=>$id,
             ];

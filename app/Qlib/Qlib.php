@@ -1180,6 +1180,13 @@ class Qlib
         }
         return $ret;
     }
+    /**
+     * remove meta datao
+     */
+    static function delete_usermeta($user_id,$meta_key=null)
+    {
+        return  DB::table('usermeta')->where('user_id',$user_id)->where('meta_key',$meta_key)->delete();
+    }
     static function explodeReturnPrimeiro($separador,$string){
         $dados = explode($separador,$string);
         if(is_array($dados)){
