@@ -60,7 +60,11 @@
                 </div>
                 @endcan
                 <div class="collapse" id="busca-id">
-                    @include('qlib.busca')
+                    @if ($routa=='clientes')
+                        @include('clientes.busca')
+                    @else
+                        @include('qlib.busca')
+                    @endif
                 </div>
             </div>
         </form>

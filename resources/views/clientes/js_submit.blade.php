@@ -7,7 +7,7 @@
             submitHandler: function(form) {
                 submitFormulario($("#{{$config['frm_id']}}"),function(res){
                     let btn_press = $('#btn-press-salv').html();
-                    lib_formatMensagem('.mens',res.mens,res.color);
+                    lib_formatMensagem('.mens',res.mens,res.color,10000);
                     if(res.exec){
                         console.log(res);
                         if(res.status_contrato){
@@ -36,6 +36,7 @@
                                 window.close(); // Close the current popup
                                 return;
                             }else{
+                                if(res.exec)
                                 window.location = redirect;
                             }
                         }else if(res.return){

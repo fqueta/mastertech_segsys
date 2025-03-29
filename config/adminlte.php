@@ -477,6 +477,11 @@ $config = [
     'livewire' => false,
 ];
 $config['menu'] = [
+    [
+        'type'         => 'navbar-search',
+        'text'         => 'search',
+        'topnav_right' => true,
+    ]
     /*
       [
           'key' => 'painel',
