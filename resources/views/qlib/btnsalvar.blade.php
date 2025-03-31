@@ -61,7 +61,10 @@
                 }
             @endphp
             @can('create',$config['route'])
-                <a href="{{$r_novo_cadastro}}" class="btn btn-default"> <i class="fas fa-plus"></i> Novo cadastro</a>
+                <a href="{{$r_novo_cadastro}}" title="{{ __('Incluir novo cadastro') }}" class="btn btn-default"> <i class="fas fa-plus"></i> {{ __('Novo cadastro') }}</a>
+                @if ($config['route']=='clientes')
+                    <button type="button" onclick="excluir_cliente('{{ $value['id'] }}','{{ route('clientes.index') }}')"  title="{{ __('Eliminar este cadastro') }}" class="btn btn-outline-danger"> <i class="fas fa-times"></i> {{ __('Excluir') }}</button>
+                @endif
             @endcan
             @if ($config['route']=='perfil')
                 <button type="submit" btn="permanecer" class="btn btn-primary">{{$label_btn_permanecer}}</button>

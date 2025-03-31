@@ -2096,8 +2096,7 @@ function checkTodosAnos() {
     $('#preload').show();
 }
 function lib_autocompleteGeral(cl,funCall){
-
-    var urlAuto = $(cl).attr('url');
+    var urlAuto = $(cl).attr('url_');
     if(typeof funCall=='undefined'){
         $( cl ).autocomplete({
             source: urlAuto,
@@ -2241,5 +2240,40 @@ function dps_reativa(res,link){
             window.location = link+'&bc=false';
             // alert(link);
         }
+    }
+}
+function clica_consulta_cliente(){
+    document.querySelector('[data-widget="navbar-search"]').click();
+}
+function excluir_cliente(id,link_r){
+    if (typeof id=='undefined') {
+        alert('Id não informado')
+        return
+    }
+    if(!window.confirm('DESEJA EXCLUIR O CADASTRO?\n\nAo prosseguir com esta ação todas as informações serão excluídas permanentemente!!')){
+        return;
+    }
+    try {
+        getAjax({
+            url:'/admin/ajax/cliente/delete/'+id,
+            type: 'POST',
+            dataType: 'json',
+            csrf: true,
+            // data:{
+            //     token: token
+            // }
+        },function(res){
+            $('#preload').fadeOut("fast");
+            lib_formatMensagem('.mens',res.mens,res.color);
+            if(res.exec){
+                window.location = link_r;
+            }
+            // dps_reativa(res,link_a);
+        },function(err){
+            $('#preload').fadeOut("fast");
+            console.log(err);
+        });
+    } catch (error) {
+        console.log(error);
     }
 }

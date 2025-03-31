@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\admin\ContratoController;
 use App\Models\_upload;
+use App\Models\Contrato;
 use App\Models\User;
 use stdClass;
 use App\Qlib\Qlib;
@@ -63,6 +64,11 @@ class ClienteController extends Controller
         $logado = Auth::user();
         if(isset($get['term'])){
             //Autocomplete
+            if(isset($get['a-campo'])&&!empty(['a-campo'])){
+                $get['filter'][$get['a-campo']] = $get['term'];
+            }else{
+                $get['filter']['nome'] = $get['term'];
+            }
             if(isset($get['id_permission']) && !empty($get['id_permission'])){
                 $sql = "SELECT * FROM users WHERE (name LIKE '%".$get['term']."%') AND id_permission=".$this->id_permission." AND ".Qlib::compleDelete();
             }else{
@@ -83,7 +89,9 @@ class ClienteController extends Controller
             if($this->routa == 'fornecedores'){
                 $user =  User::where('id_permission','=',Qlib::qoption('id_permission_fornecedores'))->orderBy('id',$config['order']);
             }else{
-                $user =  User::where('id_permission','>=',$this->id_permission)->orderBy('id',$config['order']);
+                $user =  User::join('contratos','contratos.id_cliente','=','users.id')
+                ->select('users.*','contratos.inicio','contratos.fim')
+                ->where('users.id_permission','>=',$this->id_permission)->orderBy('users.id',$config['order']);
             }
             //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
         }
@@ -97,11 +105,11 @@ class ClienteController extends Controller
                 foreach ($get['filter'] as $key => $value) {
                     if(!empty($value)){
                         if($key=='id'){
-                            $user->where($key,'LIKE', $value);
+                            $user->where('users.'.$key,'LIKE', $value);
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
                         }else{
-                            $user->where($key,'LIKE','%'. $value. '%');
+                            $user->where('users.'.$key,'LIKE','%'. $value. '%');
                             if($campos[$key]['type']=='select'){
                                 $value = $campos[$key]['arr_opc'][$value];
                             }
@@ -129,9 +137,9 @@ class ClienteController extends Controller
             }
         }
         $users->todos = $fm->count();
-        $users->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
-        $users->ativos = $fm->where('ativo','=','s')->get()->count();
-        $users->inativos = $fm->where('ativo','=','n')->get()->count();
+        $users->esteMes = $fm->whereYear('users.created_at', '=', $ano)->whereMonth('users.created_at','=',$mes)->get()->count();
+        $users->ativos = $fm->where('users.'.'ativo','=','s')->get()->count();
+        $users->inativos = $fm->where('users.'.'ativo','=','n')->get()->count();
         $ret['user'] = $user;
         $ret['user_totais'] = $users;
         $ret['arr_titulo'] = $arr_titulo;
@@ -223,7 +231,7 @@ class ClienteController extends Controller
             'token'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_permission'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','value'=>5,'tam'=>'2'],
             'name'=>['label'=>$lab_nome,'js'=>true,'active'=>true,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
-            'cpf'=>['label'=>$lab_cpf,'active'=>false,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf required','tam'=>'3'],
+            'cpf'=>['label'=>$lab_cpf,'active'=>true,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf required','tam'=>'3'],
             'cnpj'=>['label'=>'CNPJ *','active'=>false,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cnpj required','tam'=>'4','class_div'=>'div-pj '.$displayPj],
             'razao'=>['label'=>'Razão social *','js'=>true,'active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
             'config[nome_fantasia]'=>['label'=>'Nome fantasia','js'=>true,'active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
@@ -287,7 +295,7 @@ class ClienteController extends Controller
             // 'config[token]'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'config[inicioVigencia]'=>['label'=>'Início Vigência*','active'=>true,'type'=>'date','tam'=>'3','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][inicioVigencia','class_div'=>''],
             'config[fimVigencia]'=>['label'=>'Fim Vigência*','active'=>true,'type'=>'date','tam'=>'3','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][fimVigencia','class_div'=>''],
-            'config[premioSeguro]'=>['label'=>'Valor','title'=>'Valor do premio' ,'active'=>true,'type'=>'moeda','tam'=>'2','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][premioSeguro','class_div'=>''],
+            'config[premioSeguro]'=>['label'=>'Valor','title'=>'Valor do premio' ,'active'=>false,'type'=>'moeda','tam'=>'2','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][premioSeguro','class_div'=>''],
             'config[numOperacao]'=>['label'=>'N.°','active'=>true,'type'=>'hidden_text','tam'=>'2','exibe_busca'=>'d-block','event'=>'','cp_busca'=>'config][numOperacao','class_div'=>''],
             'config[status_contrato]'=>['label'=>'Status','active'=>true,'type'=>'hidden_text','tam'=>'2','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][status_contrato','class_div'=>''],
 
@@ -868,23 +876,51 @@ class ClienteController extends Controller
 
     public function destroy($id,Request $request)
     {
-        $config = $request->all();
-        $ajax =  isset($config['ajax'])?$config['ajax']:'n';
-        $routa = 'users';
-        if (!$post = User::find($id)){
-            if($ajax=='s'){
-                $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
-            }else{
-                $ret = redirect()->route($routa.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
-            }
-            return $ret;
-        }
+        // $config = $request->all();
+        // $ajax =  isset($config['ajax'])?$config['ajax']:'n';
+        // $routa = 'users';
+        // if (!$post = User::find($id)){
+        //     if($ajax=='s'){
+        //         $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
+        //     }else{
+        //         $ret = redirect()->route($routa.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
+        //     }
+        //     return $ret;
+        // }
 
-        User::where('id',$id)->delete();
-        if($ajax=='s'){
-            $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
-        }else{
-            $ret = redirect()->route($routa.'.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
+        // User::where('id',$id)->delete();
+        // if($ajax=='s'){
+        //     $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
+        // }else{
+        //     $ret = redirect()->route($routa.'.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
+        // }
+        $ret = $this->delete_all($id);
+        return $ret;
+    }
+    /**
+     * Metodo para deletetar permantente o registro de cliente e o registro de contrato
+     */
+    public function delete_all($id){
+        try {
+            //deletar o registro de contrato
+            $del_cadastro = Contrato::where('id_cliente',$id)->delete();
+            //deletar o registro de cliente
+            $del_cliente = User::where('id',$id)->delete();
+            $ret = [
+                'exec'=>true,
+                'mens'=>'Registros excluidos com sucesso',
+                'error'=>'',
+                'color'=>'success',
+            ];
+
+        } catch (\Throwable $th) {
+            $ret = [
+                'exec'=>false,
+                'error'=>$th->getMessage(),
+                'mens'=>'Registros excluidos com sucesso',
+                'color'=>'danger',
+            ];
+            //throw $th;
         }
         return $ret;
     }

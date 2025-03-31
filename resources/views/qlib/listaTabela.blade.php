@@ -167,6 +167,7 @@
                                 @endphp
                                 <td class="{{str_replace('[]','',$kd)}}" title="{{$td}}">{{$td}}</td>
                             @elseif (isset($vd['type']) && ($vd['type']=='select_multiple'))
+
                                 @php
                                 // echo $kd;
                                 $nk = str_replace('[]','',$kd);
@@ -204,10 +205,27 @@
                             @elseif(isset($vd['cp_busca']) && !empty($vd['cp_busca']))
                                 @php
                                     $cp = explode('][',$vd['cp_busca']);
+                                    $td = @$val[$cp[0]][$cp[1]];
+                                    if(isset($vd['type']) && $vd['type']=='date'){
+                                        $td = App\Qlib\Qlib::dataExibe(@$val[$cp[0]][$cp[1]]);
+                                    }
                                 @endphp
                                 @if (isset($cp[1]))
-                                    <td class="{{$cp[1]}}" title="{{ @$val[$cp[0]][$cp[1]] }}">{{ @$val[$cp[0]][$cp[1]] }}</td>
+                                    <td class="{{$cp[1]}}" title="{{ @$val[$cp[0]][$cp[1]] }}">{{ $td }}</td>
                                 @endif
+                            @elseif (isset($vd['type']) && ($vd['type']=='date'))
+                                @php
+
+                                    if(isset($vd['arr_opc']) && isset($vd['arr_opc'][$val->$kd])){
+                                        $td = $vd['arr_opc'][$val->$kd];
+                                    }else{
+                                        $td = $val->$kd;
+                                    }
+                                @endphp
+
+                                <td class="{{str_replace('[]','',$kd)}}" title="{{$td}}">
+                                    {{ App\Qlib\Qlib::dataExibe($td)}}
+                                </td>
                             @else
                                 @php
                                     if(isset($vd['arr_opc']) && isset($vd['arr_opc'][$val->$kd])){

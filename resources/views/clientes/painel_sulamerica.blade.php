@@ -12,18 +12,16 @@
     @if ($status_contrato == 'Aprovado' || $status_contrato == 'aprovado')
             <div class="col-md-12 text-right">
                 <button type="button" title="{{__('Cantelar o contrato na sulamerica')}}" data-operacao="{{$numOperacao}}" onclick="cancelarSulamerica('{{$token}}','{{$id}}',this)" class="btn btn-outline-danger">
-                    {{__('Cancelar')}}
+                   <i class="fa fa-ban"></i> {{__('Cancelar sulamerica')}}
                 </button>
             </div>
-    @else
-        {{-- @if ($dados)
+    @elseif($status_contrato == 'Cancelado' || $status_contrato == 'cancelado')
+        @if ($dados)
 
             <div class="col-md-12 text-right">
-                <button type="button" data-token="{{$id}}" onclick="contratarSulamerica(this)" class="btn btn-outline-secondary">
-                    {{__('Contratar')}}
-                </button>
+                <button title="{{__('Reativar cadastro')}}" onclick="reativar_cadastro('{{$token}}','{{ URL::full() }}')" type="button" class="btn btn-outline-secondary ml-1"><i class="fa fa-recycle"></i> {{ __('Reativar sulamerica') }}</button>
             </div>
 
-        @endif --}}
+        @endif
     @endif
 </div>

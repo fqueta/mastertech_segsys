@@ -150,6 +150,7 @@ Route::middleware([
             Route::post('/chage_status',[ConfigController::class,'chage_status'])->name('chage_status');
             Route::post('/cliente/reativar/{token}',[ContratoController::class,'reativar'])->name('cliente.reativar');
             Route::post('/cliente/cancelar/{token}',[ContratoController::class,'cancelar'])->name('cliente.cancelar');
+            Route::post('/cliente/delete/{id}',[ClienteController::class,'destroy'])->name('cliente.delete');
             // Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.destroy-ajax');
         });
         Route::fallback(function () {

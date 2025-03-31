@@ -63,9 +63,9 @@
         </div>
         @endif
         <div class="col-md-7">
-            @if (isset($config['mapa']['config']))
+            {{-- @if (isset($config['mapa']['config']))
                 {!! App\Http\Controllers\MapasController::exibeMapas($config['mapa']['config']) !!}
-            @endif
+            @endif --}}
         </div>
     </div>
     @else

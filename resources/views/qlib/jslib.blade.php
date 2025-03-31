@@ -32,7 +32,7 @@
         $('[selector-event]').on('change',function(){
             initSelector($(this));
         });
-
+        $('[mask-cpf]').inputmask('999.999.999-99');
         @if (App\Qlib\Qlib::is_frontend())
             $('.summernote').summernote({
                 height: 250,
