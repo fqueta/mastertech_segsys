@@ -428,7 +428,7 @@ function clientes_mascaraTelefone(v) {
 }
 function confirmDelete(obj){
     var id = obj.data('id');
-    if(window.confirm('DESEJA MESMO EXCLUIR?')){
+    if(window.confirm('DESEJA EXCLUIR O CADASTRO?\n\nAo prosseguir com esta ação todas as informações serão excluídas permanentemente!!')){
         // $('#frm-'+id).submit();
         submitFormulario($('#frm-'+id),function(res){
             if(res.mens){
@@ -437,6 +437,9 @@ function confirmDelete(obj){
             if(res.return){
                 location.reload();
                 //window.location = res.return
+            }
+            if(res.exec){
+                $('#tr_'.id).remove();
             }
             if(res.errors){
                 alert('erros');

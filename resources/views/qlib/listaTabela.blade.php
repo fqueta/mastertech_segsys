@@ -122,7 +122,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" data-del="true" data-id="{{$val->id}}" name="button" title="Excluir" class="btn btn-outline-danger">
-                                    <i class="fa fa-trash"></i>
+                                    <i class="fa fa-times"></i>
                                 </button>
                             </form>
                             @if($routa=='clientes')
