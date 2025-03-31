@@ -911,6 +911,7 @@ class ClienteController extends Controller
                 'mens'=>'Registros excluidos com sucesso',
                 'error'=>'',
                 'color'=>'success',
+                'return'=>route('clientes.index'),
             ];
 
         } catch (\Throwable $th) {
