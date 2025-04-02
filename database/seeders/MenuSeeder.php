@@ -103,7 +103,7 @@ class MenuSeeder extends Seeder
                 'icon'=>'fas fa-cogs',
                 'actived'=>true,
                 'url'=>'config',
-                'route'=>'sistema.config',
+                'route'=>'',
                 'pai'=>''
             ],
             [

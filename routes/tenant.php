@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\ConfigController;
 use App\Http\Controllers\admin\ContratoController;
 use App\Http\Controllers\admin\FinanceiroController;
 use App\Http\Controllers\admin\HomeController;
+use App\Http\Controllers\admin\ImportController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\SulAmericaController;
 use App\Http\Controllers\EtapaController;
@@ -210,7 +211,8 @@ Route::middleware([
         Route::resource('/clientes', '\App\Http\Controllers\admin\ClienteController',['parameters' => [
             'clientes' => 'id'
         ]]);
-        Route::get('/clientes/importar',[ClienteController::class,'importar'])->name('clientes.import');
+        Route::get('/clientes/importar',[ImportController ::class,'form_import'])->name('clientes.import');
+        Route::post('/clientes/importar',[ClienteController::class,'importar'])->name('clientes.post_import');
         Route::resource('/contratos', '\App\Http\Controllers\admin\PostsController',['parameters' => [
             'contratos' => 'id'
         ]]);
@@ -227,7 +229,8 @@ Route::middleware([
         Route::put('/perfil/update/{id}',[UploadController::class,'update'])->where('id', '[0-9]+')->name('perfil.update');
 
         Route::get('/config',[EtapaController::class,'config'])->name('sistema.config');
-        Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
+        // Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
+        Route::post('/import', [ImportController::class, 'import'])->name('import');
 
     });
 

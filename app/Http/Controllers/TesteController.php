@@ -54,10 +54,11 @@ class TesteController extends Controller
         // if($type=='update'){
         //     $ret = Qlib::update_json_fields($tab='users',$campos_bus='id',$valor_bus='3',$f_tab='config',$f_json='numOperacao',$value='3333');
         // }
-        $token = $request->get('token');
-        $ret = (new ContratoController)->status_update($token,'Reativando',[]);
-        // $ret = (new ContratoController)->update_token($token);
-        return $ret;
+        // $token = $request->get('token');
+        // $ret = (new ContratoController)->status_update($token,'Reativando',[]);
+        // // $ret = (new ContratoController)->update_token($token);
+        // return $ret;
+        return view('clientes.import');
         // return view('teste',$config);
     }
     public function ajax(){

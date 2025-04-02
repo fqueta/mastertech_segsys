@@ -46,6 +46,10 @@ class UserController extends Controller
             $this->title = __('Cadastro de fornecedores');
         }
     }
+    /**gera um id de pemissão automatico para o caso de clientes */
+    public function id_permission_clientes(){
+        return Qlib::qoption('id_permission_clientes');
+    }
     /**gera um id de pemissão automatico para o caso de fornecedores */
     public function id_permission_fornecedores(){
         return Qlib::qoption('id_permission_fornecedores');
@@ -85,7 +89,7 @@ class UserController extends Controller
             }else{
                 // $id_permission_clientes = Qlib::qoption('id_permission_clientes');
                 // if()
-                $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
+                $user =  User::where('id_permission','>=',$logado->id_permission)->where('id_permission','!=',$this->id_permission_clientes())->orderBy('id',$config['order']);
             }
             //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
         }
@@ -206,7 +210,7 @@ class UserController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Permissão',
                    ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
+                'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."' AND id != '".$this->id_permission_clientes()."'",'name','id'),'exibe_busca'=>'d-block',
                 'event'=>'required',
                 'tam'=>'3',
                 'value'=>@$_GET['id_permission'],
