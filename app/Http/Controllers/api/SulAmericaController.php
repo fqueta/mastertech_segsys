@@ -13,12 +13,14 @@ class SulAmericaController extends Controller
     protected $url;
     protected $pass;
     protected $user;
+    protected $produtoParceiro;
     public function __construct()
     {
         // $this->url = "https://services.sulamerica.com.br/saude/autorizacao"; // URL do WebService da SulAmérica
         $this->url = Qlib::qoption('url_api_sulamerica') ? Qlib::qoption('url_api_sulamerica') : "https://canalvenda-internet-develop.executivoslab.com.br/services/canalvenda?wsdl"; // URL do WebService da SulAmérica
         $this->user = Qlib::qoption('user_api_sulamerica') ? Qlib::qoption('user_api_sulamerica') : "yello1232user";
         $this->pass = Qlib::qoption('pass_api_sulamerica') ? Qlib::qoption('pass_api_sulamerica') : "yello1232pass";
+        $this->produtoParceiro = Qlib::qoption('produtoParceiro') ? Qlib::qoption('produtoParceiro') : "10232";
     }
     /**
      * Metodo para ser chamado na api do ajax
@@ -69,7 +71,8 @@ class SulAmericaController extends Controller
         $documento = isset($config['documento']) ? $config['documento'] : ''; //85528114306;
         $premioSeguro = isset($config['premioSeguro']) ? $config['premioSeguro'] : '3.96'; //3.96;
         $tipoDocumento = isset($config['tipoDocumento']) ? $config['tipoDocumento'] : 'C'; //C para cpf;
-        $produto = isset($config['produto']) ? $config['produto'] : '10232'; //C para cpf;
+        // $produto = isset($config['produto']) ? $config['produto'] : '10232'; //C para cpf;
+        $produto = $this->produtoParceiro; //Produto padrão;
         $canalVenda = isset($config['canalVenda']) ? $config['canalVenda'] : 'SITE'; //C para cpf;
         $operacaoParceiro = isset($config['operacaoParceiro']) ? $config['operacaoParceiro'] : '000004'; //Numero de controle do parceiro;
         $ret = ['exec'=>false];
