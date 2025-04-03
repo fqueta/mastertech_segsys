@@ -42,6 +42,12 @@ class QoptionSeeder extends Seeder
                 'obs'=>'',
             ],
             [
+                'nome'=>'Produto padrão',
+                'url'=>'produtoParceiro',
+                'valor'=>'',
+                'obs'=>'',
+            ],
+            [
                 'nome'=>'Senha da api da Sulamerica',
                 'url'=>'url_pass_sulamerica',
                 'valor'=>'',
