@@ -902,6 +902,17 @@ class ClienteController extends Controller
      */
     public function delete_all($id){
         try {
+            //Cancelar ele caso o status seja aprovado
+            $status = Qlib::get_usermeta($id,(new ContratoController)->campo_meta3,true);
+            if($status=='Aprovado' || $status=='aprovado'){
+                $ret = [
+                    'exec'=>false,
+                    // 'error'=>$th->getMessage(),
+                    'mens'=>'Contrato <b>'.$status.'</b> é necessário <b>Cancelar com a sulamerica</b> antes',
+                    'color'=>'danger',
+                ];
+                return $ret;
+            }
             //deletar o registro de contrato
             $del_cadastro = Contrato::where('id_cliente',$id)->delete();
             //deletar o registro de cliente

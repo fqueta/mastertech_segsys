@@ -28,23 +28,23 @@ class TesteController extends Controller
     public function index(Request $request)
     {
 
-        // $type = $request->get('type');
-        // $ret = false;
-        // if($type=='contratacao'){
-        //     $numero = $request->get('numero') ? $request->get('numero') : 6;
-        //     $config = [
-        //         'plano'=>1,
-        //         'operacaoParceiro'=>Qlib::zerofill($numero,5),
-        //         'nomeSegurado'=>'Programdor teste',
-        //         'dataNascimento'=>'1989-06-05',
-        //         'sexo'=>'F',
-        //         'uf'=>'MG',
-        //         'documento'=>'12345678909',
-        //         'inicioVigencia'=>'2025-03-25',
-        //         'fimVigencia'=>'2026-03-25',
-        //     ];
-        //     $ret = (new SulAmericaController)->contratacao($config);
-        // }
+        $type = $request->get('type');
+        $ret = false;
+        if($type=='contratacao'){
+            $numero = $request->get('numero') ? $request->get('numero') : 6;
+            $config = [
+                'plano'=>1,
+                'operacaoParceiro'=>Qlib::zerofill($numero,5),
+                'nomeSegurado'=>'Programdor teste',
+                'dataNascimento'=>'1989-06-05',
+                'sexo'=>'F',
+                'uf'=>'MG',
+                'documento'=>'12345678909',
+                'inicioVigencia'=>'2025-03-25',
+                'fimVigencia'=>'2026-03-25',
+            ];
+            $ret = (new SulAmericaController)->contratacao($config);
+        }
         // if($type=='cancela'){
         //     $config = [
         //         'numeroOperacao'=>'740442',
@@ -58,6 +58,7 @@ class TesteController extends Controller
         // $ret = (new ContratoController)->status_update($token,'Reativando',[]);
         // // $ret = (new ContratoController)->update_token($token);
         // return $ret;
+
         return view('clientes.import');
         // return view('teste',$config);
     }

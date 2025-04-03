@@ -77,6 +77,7 @@ class SulAmericaController extends Controller
         $operacaoParceiro = isset($config['operacaoParceiro']) ? $config['operacaoParceiro'] : '000004'; //Numero de controle do parceiro;
         $ret = ['exec'=>false];
         $uf = strtoupper($uf);
+        // dd($this->url,$config);
         if(!$dataNascimento){
             $ret['mens'] = 'Data de Nascimento é obrigatória';
             return $ret;
