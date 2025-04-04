@@ -210,7 +210,7 @@ class ClienteController extends Controller
 
             }
         }
-        $id_produto_padrao = '10232'; //unico produto padrão que pode ser contratado pela sulameriaca
+        $id_produto_padrao = Qlib::qoption('produtoParceiro') ? Qlib::qoption('produtoParceiro') : '10232'; //unico produto padrão que pode ser contratado pela sulameriaca
         $ret = [
             'sep2'=>['label'=>'info','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>$info_obs,'script_show'=>''],
             'id'=>['label'=>'Id','js'=>true,'active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
