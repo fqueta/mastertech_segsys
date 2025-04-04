@@ -605,6 +605,14 @@ class ClienteController extends Controller
                     $ret = $sulamerica_contratar;
                     $ret['status_contrato'] = $this->get_status_contrato($id_cliente);
                     $ret['numero_operacao'] = $this->get_numero_operacao($id_cliente);
+                }else{
+                    if(isset($sulamerica_contratar['retorno']) && $sulamerica_contratar['retorno'] == 65){
+                        $status_contrato = $this->get_status_contrato($id_cliente);
+                        if(!$status_contrato){
+                            $status = 'Duplicidade';
+                            $ret['status_contrato'] = (new ContratoController)->status_update($token_contrato,$status,$ret);
+                        }
+                    }
                 }
             }
         }
