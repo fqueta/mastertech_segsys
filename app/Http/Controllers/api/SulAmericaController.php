@@ -131,7 +131,7 @@ class SulAmericaController extends Controller
             </soapenv:Body>
         </soapenv:Envelope>
         ';
-        dd($xml);
+        // dd($xml);
         $response = Http::withHeaders([
             'Content-Type' => 'application/xml',//'text/xml; charset=utf-8',
             'SOAPAction' => '',
@@ -142,7 +142,7 @@ class SulAmericaController extends Controller
         // $ret['requsição'] = $xml;
         // $ret['passwordDigest'] = $passwordDigest;
         $ret['body'] = $resposta;
-        $ret = $this->xmlContrata_to_array($resposta);
+        $ret = $this->xmlContrata_to_array($resposta,$config);
         return $ret; // Retorna a resposta do WebService
     }
     /**
@@ -188,7 +188,7 @@ class SulAmericaController extends Controller
         // $ret['requsição'] = $xml;
         // $ret['passwordDigest'] = $passwordDigest;
         $ret['body'] = $resposta;
-        $ret = $this->xmlCancela_to_array($resposta);
+        $ret = $this->xmlCancela_to_array($resposta,$config);
         if(isset($ret['exec']) && !empty($token_contrato)){
             //Atualizar o status do contrato
             (new ContratoController)->status_update($token_contrato,'Cancelado',$ret);
@@ -201,7 +201,7 @@ class SulAmericaController extends Controller
         $decodedXml = html_entity_decode($cleanXml);
         return $decodedXml;
     }
-    public function xmlContrata_to_array($xml){
+    public function xmlContrata_to_array($xml,$dados=[]){
         $xmlObject = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
 
         // Passo 2: Registrar os namespaces (SOAP e SulAmérica)
@@ -214,6 +214,10 @@ class SulAmericaController extends Controller
         $ret['data'] = [];
         $ret['mens'] = '';
         $ret['color'] = 'danger';
+        if(Qlib::isAdmin(1)){
+            $ret['dados'] = $dados;
+
+        }
 
         // Verificar se o nó foi encontrado
         if (!empty($contratarSeguroNode)) {
@@ -244,7 +248,7 @@ class SulAmericaController extends Controller
         }
         return $ret;
     }
-    public function xmlCancela_to_array($xml){
+    public function xmlCancela_to_array($xml,$dados=[]){
         $xmlObject = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
 
         // Passo 2: Registrar os namespaces (SOAP e SulAmérica)
@@ -257,7 +261,10 @@ class SulAmericaController extends Controller
         $ret['data'] = [];
         $ret['mens'] = '';
         $ret['color'] = 'danger';
+        if(Qlib::isAdmin(1)){
+            $ret['dados'] = $dados;
 
+        }
         // Verificar se o nó foi encontrado
         if (!empty($confirmarCancelamento)) {
             // Passo 4: Extrair o XML interno como string
