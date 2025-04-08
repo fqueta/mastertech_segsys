@@ -578,10 +578,11 @@ class ClienteController extends Controller
         if(!$id_produto){
             return ['exec'=>false,'mens'=>'Produto inválido','color'=>'danger'];
         }
-
+        $planoPadrao = Qlib::qoption('planoPadrao') ? Qlib::qoption('planoPadrao') : 2;
         $dsalv = [
             'id_cliente'=>$id_cliente,
             'id_produto'=>$id_produto,
+            'id_plano'=>$planoPadrao,
             'inicio'=>$inicio,
             'autor'=>Auth::id(),
             'fim'=>$fim,

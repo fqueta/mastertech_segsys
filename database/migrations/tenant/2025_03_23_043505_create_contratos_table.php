@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('id_cliente')->nullable();
             $table->text('id_produto')->nullable();
+            $table->text('id_plano')->nullable();
             $table->date('inicio');
             $table->date('fim');
             $table->json('config')->nullable();

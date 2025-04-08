@@ -67,7 +67,7 @@ class SulAmericaController extends Controller
         $fimVigencia = isset($config['fimVigencia']) ? $config['fimVigencia'] : ''; //2026-03-23;
         $sexo = isset($config['sexo']) ? $config['sexo'] : false; //M;
         $uf = isset($config['uf']) ? $config['uf'] : false; //PI;
-        $planoProduto = isset($config['planoProduto']) ? $config['planoProduto'] : '2'; //1;
+        $planoProduto = isset($config['planoProduto']) ? $config['planoProduto'] : '1'; //1;
         $documento = isset($config['documento']) ? $config['documento'] : ''; //85528114306;
         $premioSeguro = isset($config['premioSeguro']) ? $config['premioSeguro'] : '3.96'; //3.96;
         $tipoDocumento = isset($config['tipoDocumento']) ? $config['tipoDocumento'] : 'C'; //C para cpf;
@@ -131,6 +131,7 @@ class SulAmericaController extends Controller
             </soapenv:Body>
         </soapenv:Envelope>
         ';
+        dd($xml);
         $response = Http::withHeaders([
             'Content-Type' => 'application/xml',//'text/xml; charset=utf-8',
             'SOAPAction' => '',

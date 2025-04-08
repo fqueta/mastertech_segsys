@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\api\SulAmericaController;
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
+use App\Models\Qoption;
 use App\Models\User;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
@@ -31,16 +32,20 @@ class ContratoController extends Controller
             'contratos.inicio',
             'contratos.fim',
             'contratos.id as id_contrato',
+            'contratos.id_plano',
             'contratos.config as config_contrato',
         )
         ->join('users','contratos.id_cliente','users.id')
         ->where('contratos.token',$token)
+        ->orderBy('contratos.id','DESC')
         ->get();
         $dcc = [];
         if($dc->count()){
             $dc = $dc->toArray();
             $dcc = isset($dc[0]) ? $dc[0] : [] ;
+            // dd($dc);
             $integracao = [
+                'planoProduto'=>@$dcc['id_plano'] ? $dcc['id_plano'] : Qlib::qoption('planoPadrao'),
                 'operacaoParceiro'=>$token,
                 'produto'=>isset($dcc['config']['id_produto']) ? $dcc['config']['id_produto'] : '',
                 'nomeSegurado'=>$dcc['name'],
