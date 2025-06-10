@@ -16,7 +16,7 @@ return [
 
     'name' => env('APP_NAME', 'SEGSYS'),
     'dominio' => 'https://maisaqui.com.br/',
-    'version' => '1.0.0.4',
+    'version' => '1.0.0.5',
     'id_app' => env('ID_APP', 'segsys'),
     'last_update' => '27/03/2025',
 

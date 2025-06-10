@@ -2280,3 +2280,16 @@ function excluir_cliente(id,link_r){
         console.log(error);
     }
 }
+function calculaFim(inicio){
+    var arr_data = inicio.split('-');
+    if(a=arr_data[0]){
+        var ano = new Number(a)+1;
+        if(m=arr_data[1]){
+            if(d=arr_data[2]){
+                var as = ano.toString();
+                var n_data = ano+'-'+m+'-'+d;
+                document.querySelector('[name="config[fimVigencia]"]').value = n_data;
+            }
+        }
+    }
+}

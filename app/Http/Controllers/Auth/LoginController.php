@@ -83,7 +83,7 @@ class LoginController extends Controller
                 $dUser =  Auth::user();
                 session()->push('user_l', $dUser); //usuario logado
                 // dd($dUser);
-                $id_cliente = 5;
+                $id_cliente = 10;
                 if($request->has('r')){
                     //nesse caso redirect ulr
                     return redirect($request->get('r'));

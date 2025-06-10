@@ -61,7 +61,9 @@ class ClienteController extends Controller
             'limit'=>isset($get['limit']) ? $get['limit']: 50,
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
-        $logado = Auth::user();
+        // $logado = Auth::user();
+
+
         if(isset($get['term'])){
             //Autocomplete
             if(isset($get['a-campo'])&&!empty(['a-campo'])){
@@ -76,6 +78,7 @@ class ClienteController extends Controller
                 // JOIN quadras as q ON q.id=l.quadra
                 // WHERE (l.name LIKE '%".$get['term']."%' OR q.name LIKE '%".$get['term']."%' ) AND ".Qlib::compleDelete('l');
                 $compleSql = false;
+
                 if($this->routa == 'fornecedores'){
                     $compleSql = "AND id_permission = '".$this->id_permission_fornecedores() ."'";
                 }
@@ -89,9 +92,20 @@ class ClienteController extends Controller
             if($this->routa == 'fornecedores'){
                 $user =  User::where('id_permission','=',Qlib::qoption('id_permission_fornecedores'))->orderBy('id',$config['order']);
             }else{
-                $user =  User::join('contratos','contratos.id_cliente','=','users.id')
-                ->select('users.*','contratos.inicio','contratos.fim')
-                ->where('users.id_permission','>=',$this->id_permission)->orderBy('users.id',$config['order']);
+                if(Qlib::is_partner()){
+                    //quando for um parceiro ele visualiza apenas os seus clientes
+                    $compleSql = false;
+                    $user =  User::join('contratos','contratos.id_cliente','=','users.id')
+                    ->select('users.*','contratos.inicio','contratos.fim')
+                    ->where('users.id_permission','>=',$this->id_permission)
+                    ->where('contratos.autor','=',Auth::id())
+                    ->orderBy('users.id',$config['order']);
+                }else{
+
+                    $user =  User::join('contratos','contratos.id_cliente','=','users.id')
+                    ->select('users.*','contratos.inicio','contratos.fim')
+                    ->where('users.id_permission','>=',$this->id_permission)->orderBy('users.id',$config['order']);
+                }
             }
             //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
         }
@@ -166,9 +180,15 @@ class ClienteController extends Controller
     public function get_numero_operacao($id){
         return Qlib::get_usermeta($id,(new ContratoController)->campo_meta2,true);
     }
+    // public function get_certificado($id_cliente=null,$json_contrato=null){
+    //     if($id_cliente && !$json_contrato){
+    //         $json_contrato =
+    //     }
+    // }
     public function campos($dados=false,$local='index'){
-        $user = Auth::user();
+        $autor_id = Auth::id();
         // $permission = new admin\UserPermissions($user);
+        $status = false;
         if(isset($dados['tipo_pessoa']) && $dados['tipo_pessoa'] && !isset($_GET['tipo'])){
             $_GET['tipo'] = $dados['tipo_pessoa'];
         }
@@ -230,6 +250,8 @@ class ClienteController extends Controller
             'sep0'=>['label'=>'informações','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Informe os dados').'</h4><hr>','script_show'=>''],
             'token'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_permission'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','value'=>5,'tam'=>'2'],
+            'autor'=>['label'=>'autor','js'=>true,'active'=>false,'type'=>'hidden','value'=>$autor_id,'exibe_busca'=>'d-block','value'=>5,'tam'=>'2'],
+
             'name'=>['label'=>$lab_nome,'js'=>true,'active'=>true,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
             'cpf'=>['label'=>$lab_cpf,'active'=>true,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf required','tam'=>'3'],
             'cnpj'=>['label'=>'CNPJ *','active'=>false,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cnpj required','tam'=>'4','class_div'=>'div-pj '.$displayPj],
@@ -293,10 +315,11 @@ class ClienteController extends Controller
             //'foto_perfil'=>['label'=>'Foto','active'=>false,'js'=>false,'placeholder'=>'','type'=>'file','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
             'info_contrato'=>['label'=>'contrato','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center bg-secondary">'.__('Contrato Sulamerica').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Contrato').'</h4><hr>'],
             // 'config[token]'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'config[inicioVigencia]'=>['label'=>'Início Vigência*','active'=>true,'type'=>'date','tam'=>'3','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][inicioVigencia','class_div'=>''],
+            'config[inicioVigencia]'=>['label'=>'Início Vigência*','active'=>true,'type'=>'date','tam'=>'3','exibe_busca'=>'d-block','event'=>'required onchange=calculaFim(this.value)','cp_busca'=>'config][inicioVigencia','class_div'=>''],
             'config[fimVigencia]'=>['label'=>'Fim Vigência*','active'=>true,'type'=>'date','tam'=>'3','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][fimVigencia','class_div'=>''],
-            'config[premioSeguro]'=>['label'=>'Valor','title'=>'Valor do premio' ,'active'=>false,'type'=>'moeda','tam'=>'2','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][premioSeguro','class_div'=>''],
-            'config[numOperacao]'=>['label'=>'N.°','active'=>true,'type'=>'hidden_text','tam'=>'2','exibe_busca'=>'d-block','event'=>'','cp_busca'=>'config][numOperacao','class_div'=>''],
+            // 'config[premioSeguro]'=>['label'=>'Valor','title'=>'Valor do premio' ,'active'=>false,'type'=>'hidden','tam'=>'2','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][premioSeguro','class_div'=>''],
+            'config[numCertificado]'=>['label'=>'C.','active'=>false,'type'=>'hidden_text','tam'=>'2','exibe_busca'=>'d-block','event'=>'','cp_busca'=>'config][numCertificado','class_div'=>''],
+            'config[numOperacao]'=>['label'=>'N.°','active'=>false,'type'=>'hidden_text','tam'=>'2','exibe_busca'=>'d-block','event'=>'','cp_busca'=>'config][numOperacao','class_div'=>''],
             'config[status_contrato]'=>['label'=>'Status','active'=>true,'type'=>'hidden_text','tam'=>'2','exibe_busca'=>'d-block','event'=>'required','cp_busca'=>'config][status_contrato','class_div'=>''],
 
             'painelsulamerica'=>['label'=>'Peinel','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'clientes.painel_sulamerica','dados'=>[
@@ -307,11 +330,32 @@ class ClienteController extends Controller
             'ativo'=>['label'=>'Ativar contrato','js'=>false,'tab'=>$this->tab,'active'=>false,'type'=>'hidden','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             // 'preferencias[newslatter]'=>['label'=>'Deseja receber e-mails com as novidades','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'preferencias][newslatter'],
         ];
-        // if(Qlib::isAdmin(2)){
-        //     $ret['preferencias_label'] = ['label'=>'Preferencias','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>'];
-        //     $ret['ativo'] = ['label'=>'Visualizar cadastro','js'=>true,'tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']];
-
-        // }
+        if(Qlib::isAdmin(2)){
+            // $ret['preferencias_label'] = ['label'=>'Preferencias','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>'];
+            // $ret['ativo'] = ['label'=>'Visualizar cadastro','js'=>true,'tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']];
+            if($local=='edit'){
+                if($status!='Aprovado' && $status!='Cancelado'){
+                    // $status_contrato = $this->get_status_contrato($id_cliente);
+                    $ret['config[status_contrato]']['type'] = 'select';
+                    $ret['config[status_contrato]']['arr_opc'] = Qlib::sql_array("SELECT value,nome FROM tags WHERE ativo='s' AND pai ='status_contratos'",'nome','value');
+                    $ret['config[status_contrato]']['option_select'] = true;
+                    $ret['config[status_contrato]']['event'] = '';
+                }
+            }
+            $ret['autor'] = [
+                'label'=>'Parceiro',
+                'active'=>true,
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s' AND id_permission='".Qlib::qoption('partner_permission_id')."'",'name','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'12',
+                'class'=>'select2','class_div'=>' ',
+            ];
+        }
+        //Reformular campos para parceiros
+        if(Qlib::is_partner()){
+            $ret['config[id_produto]']['type'] = 'hidden';
+        }
         if($this->routa == 'fornecedores'){
             $ret['email']['tam'] = 9;
             $ret['id_permission'] = ['label'=>'id_permission','js'=>true,'value'=>$this->id_permission_fornecedores() ,'active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'];
@@ -324,9 +368,22 @@ class ClienteController extends Controller
                 $campo_meta1 = $cc->campo_meta1;
                 $campo_meta2 = $cc->campo_meta2;
                 $campo_meta3 = $cc->campo_meta3;
+                $campo_meta5 = $cc->campo_meta5;
+                $contrato = Qlib::get_usermeta($dados['id'],$campo_meta1,true);
                 $numOperacao = Qlib::get_usermeta($dados['id'],$campo_meta2,true);
                 $status_aprovado = Qlib::get_usermeta($dados['id'],$campo_meta3,true);
+                $dados['autor'] = $dados['autor'] ? $dados['autor'] : Auth::id();
+                $ret['autor']['value'] = $dados['autor'];
+                if(Qlib::is_partner()){
+                    $ret['autor']['type'] = 'hidden';
+                }
+
                 if($numOperacao){
+                    if($contrato){
+                        $id_contrato = $cc->get_certificado($dados['id']);
+                        $ret['config['.$campo_meta5.']']['value'] = $id_contrato;
+                    }
+                    $ret['config['.$campo_meta2.']']['value'] = $numOperacao;
                     $ret['config['.$campo_meta2.']']['value'] = $numOperacao;
                     $ret['config['.$campo_meta3.']']['value'] = $status_aprovado;
                     $ret['config[inicioVigencia]']['type'] = 'hidden_text';
@@ -417,7 +474,8 @@ class ClienteController extends Controller
     }
     public function index(User $user)
     {
-        $this->authorize('is_admin', $user);
+        // $this->authorize('is_admin', $user);
+        $this->authorize('is_user_back', $user);
         $ajax = isset($_GET['ajax'])?$_GET['ajax']:'n';
         $title = 'Usuários Cadastrados';
         $titulo = $title;
@@ -487,7 +545,8 @@ class ClienteController extends Controller
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
+        // $this->authorize('is_admin', $user);
+         $this->authorize('is_user_back', $user);
         $title = $this->title;
         $titulo = $title;
         $config = [
@@ -523,6 +582,7 @@ class ClienteController extends Controller
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
+        $dados['autor'] = isset($dados['autor'])?$dados['autor']:Auth::id();
         //$dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         //inicio gerenciar a pemissão automatica
         if($this->routa == 'fornecedores' && is_null($dados['id_permission'])){
@@ -549,7 +609,9 @@ class ClienteController extends Controller
         ];
         //Adicionar um contrato caso o cliente foi salvo com sucesso
         if($ret['idCad'] && ($id_cliente = $ret['idCad']) && isset($dados['config']['id_produto'])){
+           $premioSeguro = Qlib::qoption('premioSeguro') ? Qlib::qoption('premioSeguro') : 3.96;
            $dados['config']['token'] = isset($dados['token']) ? $dados['token'] : false;
+           $dados['config']['premioSeguro'] = $premioSeguro ? $premioSeguro : false;
            $ret = $this->store_contratos($id_cliente,$dados['config']);
         }
 
@@ -578,13 +640,20 @@ class ClienteController extends Controller
         if(!$id_produto){
             return ['exec'=>false,'mens'=>'Produto inválido','color'=>'danger'];
         }
+        $autor = Qlib::buscaValorDb0('users','id',$id_cliente,'autor');
+        $autor = $autor ? $autor : Auth::id();
         $planoPadrao = Qlib::qoption('planoPadrao') ? Qlib::qoption('planoPadrao') : 2;
+        $premioSeguro = Qlib::qoption('premioSeguro') ? Qlib::qoption('premioSeguro') : 3.96;
+        $config = [
+            'premioSeguro'=>$premioSeguro,
+        ];
         $dsalv = [
             'id_cliente'=>$id_cliente,
             'id_produto'=>$id_produto,
             'id_plano'=>$planoPadrao,
             'inicio'=>$inicio,
-            'autor'=>Auth::id(),
+            'config'=>Qlib::lib_array_json($config),
+            'autor'=>$autor,
             'fim'=>$fim,
         ];
         if($ac=='cad'){
@@ -723,7 +792,8 @@ class ClienteController extends Controller
         $dados = User::where('id',$id)->get();
         $routa = $this->routa;//'users';
         $view = $this->view;//'users';
-        $this->authorize('is_admin', $user);
+        // $this->authorize('is_admin', $user);
+         $this->authorize('is_user_back', $user);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de users';
@@ -772,7 +842,8 @@ class ClienteController extends Controller
         $dados = User::where('id',$id)->get();
         $routa = $this->routa;//'users';
         $view = $this->view;//'users';
-        $this->authorize('is_admin', $routa);
+        // $this->authorize('is_admin', $routa);
+         $this->authorize('is_user_back', $routa);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de users';
@@ -840,8 +911,9 @@ class ClienteController extends Controller
         }
         $userLogadon = Auth::id();
         $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
+        $data['autor'] = isset($data['autor'])?$data['autor']:$userLogadon;
         $data['preferencias']['newslatter'] = isset($data['preferencias']['newslatter'])?$data['preferencias']['newslatter']:'n';
-        $data['autor'] = $userLogadon;
+        // $data['autor'] = $userLogadon;
         $dados_config = [];
         if(isset($dados['config'])){
             $dados_config = $dados['config'];

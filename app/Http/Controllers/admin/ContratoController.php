@@ -19,12 +19,14 @@ class ContratoController extends Controller
     public $campo_meta2;
     public $campo_meta3;
     public $campo_meta4;
+    public $campo_meta5;
     public function __construct()
     {
         $this->campo_meta1 = 'contrato';
         $this->campo_meta2 = 'numOperacao';
         $this->campo_meta3 = 'status_contrato';
         $this->campo_meta4 = 'premioSeguro';
+        $this->campo_meta5 = 'numCertificado';
     }
     public function dc($token=false){
         $dc = Contrato::select(
@@ -44,13 +46,16 @@ class ContratoController extends Controller
             $dc = $dc->toArray();
             $dcc = isset($dc[0]) ? $dc[0] : [] ;
             // dd($dc);
+            if(!empty($dcc['config_contrato'])){
+                $dcc['config_contrato'] = Qlib::lib_json_array($dcc['config_contrato']);
+            }
             $integracao = [
                 'planoProduto'=>@$dcc['id_plano'] ? $dcc['id_plano'] : Qlib::qoption('planoPadrao'),
                 'operacaoParceiro'=>$token,
                 'produto'=>isset($dcc['config']['id_produto']) ? $dcc['config']['id_produto'] : '',
                 'nomeSegurado'=>$dcc['name'],
                 'dataNascimento'=>isset($dcc['config']['nascimento']) ? $dcc['config']['nascimento'] : '',
-                'premioSeguro'=>isset($dcc['config']['premioSeguro']) ? $dcc['config']['premioSeguro'] : '',
+                'premioSeguro'=>isset($dcc['config_contrato']['premioSeguro']) ? $dcc['config_contrato']['premioSeguro'] : '',
                 'sexo'=>strtoupper($dcc['genero']),
                 'documento'=>$dcc['cpf'],
                 'inicioVigencia'=>$dcc['inicio'],
@@ -64,9 +69,7 @@ class ContratoController extends Controller
             $integracao['documento'] = str_replace('.','',$integracao['documento']);
             $integracao['documento'] = str_replace('-','',$integracao['documento']);
             $dcc['integracao_sulamerica'] = $integracao;
-            if(!empty($dcc['config_contrato'])){
-                $dcc['config_contrato'] = Qlib::lib_json_array($dcc['config_contrato']);
-            }
+
             $campo_meta2 = 'numOperacao';
             $numOperacao = Qlib::get_usermeta($dcc['id'],$campo_meta2,true);
             if($numOperacao){
@@ -197,6 +200,16 @@ class ContratoController extends Controller
         return $ret;
 
         // $token = Qlib::buscaValorDb0('users','token',$id,'token');
+    }
+    /**
+     * Metodo para recuperar o numero do certificado com o id_do cliente
+     */
+    public function get_certificado($id_cliente=null){
+        $campo_meta1 = $this->campo_meta1;
+        $contrato = Qlib::get_usermeta($id_cliente,$campo_meta1,true);
+        $arr_contrato = Qlib::lib_json_array($contrato);
+        $ret = isset($arr_contrato['data']['numCertificado']) ? $arr_contrato['data']['numCertificado']:0;
+        return $ret;
     }
     /**
      * Display a listing of the resource.

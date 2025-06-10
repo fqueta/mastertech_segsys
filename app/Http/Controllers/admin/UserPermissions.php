@@ -179,7 +179,7 @@ class UserPermissions extends Controller
         $dados['active'] = isset($dados['active'])?$dados['active']:'n';
         $dados['id_menu'] = isset($dados['id_menu'])?$dados['id_menu']:[];
 
-        //dd($dados);
+        // dd($dados);
         $salvar = Permission::create($dados);
         $route = $this->routa.'.index';
         $ret = [

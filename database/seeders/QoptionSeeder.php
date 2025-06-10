@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Qoption;
+use App\Qlib\Qlib;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -54,9 +55,15 @@ class QoptionSeeder extends Seeder
                 'obs'=>'',
             ],
             [
+                'nome'=>'Permissão padrão do parceiro',
+                'url'=>'partner_permission_id',
+                'valor'=>'6',
+                'obs'=>'',
+            ],
+            [
                 'nome'=>'Permissão padrão FrontEnd',
                 'url'=>'id_permission_front',
-                'valor'=>'6',
+                'valor'=>'7',
                 'obs'=>'',
             ],
             [
@@ -65,12 +72,6 @@ class QoptionSeeder extends Seeder
                 'valor'=>'Cliente em processo de reativação, por favor confira as informações de cadastro e clique em salvar para continuar',
                 'obs'=>'',
             ],
-            // [
-            //     'nome'=>'Editor padrão',
-            //     'url'=>'editor_padrao',
-            //     'valor'=>'tinymce',
-            //     'obs'=>'opçoes: Laraberg, summernonet ou tinymce',
-            // ],
             // [
             //     'nome'=>'Nome da Empresa',
             //     'url'=>'empresa',

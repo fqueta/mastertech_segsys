@@ -69,6 +69,7 @@ Route::middleware([
         ]])->middleware('auth');
         Route::get('sics',[sicController::class,'relatorios'])->name('sic.internautas.relatorios');
     });
+
     Route::prefix('/'.$prefixo_admin)->group(function(){
         Route::get('/', [HomeController::class,'index'])->name('home.admin');
         Route::prefix('users')->group(function(){
@@ -129,10 +130,10 @@ Route::middleware([
             'tags' => 'id'
         ]]);
         //inicio Rotas módulo Sic
-        Route::resource('sic','\App\Http\Controllers\admin\sicController',['as'=>'admin','parameters' => ['sic' => 'id']]);
-        Route::get('sics/relatorios', ['\App\Http\Controllers\admin\sicController', 'relatorios'])->name('admin.sic.relatorios');
-        Route::get('sics/config', ['\App\Http\Controllers\admin\sicController', 'config'])->name('admin.sic.config');
-        Route::get('sics/config/{url}', ['\App\Http\Controllers\admin\sicController', 'config'])->name('admin.sic.config.edit');
+        // Route::resource('sic','\App\Http\Controllers\admin\sicController',['as'=>'admin','parameters' => ['sic' => 'id']]);
+        // Route::get('sics/relatorios', ['\App\Http\Controllers\admin\sicController', 'relatorios'])->name('admin.sic.relatorios');
+        // Route::get('sics/config', ['\App\Http\Controllers\admin\sicController', 'config'])->name('admin.sic.config');
+        // Route::get('sics/config/{url}', ['\App\Http\Controllers\admin\sicController', 'config'])->name('admin.sic.config.edit');
         //Fim Rotas módulo Sic
         Route::prefix('uploads')->group(function(){
             Route::get('/',[uploadController::class,'index'])->name('uploads.index');
@@ -239,6 +240,7 @@ Route::middleware([
         Route::get('/pefil',[UserController::class,'perfilShow'])->name('sistema.perfil');
         Route::get('/perfil/edit',[UserController::class,'perfilEdit'])->name('sistema.perfil.edit');
         Route::post('/perfil/store',[UserController::class,'perfilStore'])->name('sistema.perfil.store');
+        // Route::post('/perfil/index',[UserController::class,'perfilIndex'])->name('perfil.index');
         // Route::get('/config',[EtapaController::class,'config'])->name('sistema.config');
         // Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
     });

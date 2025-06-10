@@ -54,6 +54,10 @@ class UserController extends Controller
     public function id_permission_fornecedores(){
         return Qlib::qoption('id_permission_fornecedores');
     }
+    /**gera um id de pemissão automatico para o caso de parceiros */
+    public function partner_permission_id(){
+        return Qlib::qoption('partner_permission_id');
+    }
     public function queryUsers($get=false,$config=false)
     {
         $ret = false;
@@ -88,7 +92,6 @@ class UserController extends Controller
                 $user =  User::where('id_permission','=',Qlib::qoption('id_permission_fornecedores'))->orderBy('id',$config['order']);
             }else{
                 // $id_permission_clientes = Qlib::qoption('id_permission_clientes');
-                // if()
                 $user =  User::where('id_permission','>=',$logado->id_permission)->where('id_permission','!=',$this->id_permission_clientes())->orderBy('id',$config['order']);
             }
             //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);

@@ -1383,4 +1383,29 @@ class Qlib
         }
         return $ret;
     }
+    /**
+     * Retorna a permissão do usuario logado
+     */
+    static function get_permission($user_logado=null){
+        $ret = null;
+        if(!$user_logado){
+            $user_logado = Auth::user();
+        }
+        if(isset($user_logado['id_permission'])){
+            $ret = $user_logado['id_permission'];
+        }
+        return $ret;
+    }
+    /**
+     * Verifica se o usuario logado é um parceiro ou não
+     */
+    static function is_partner(){
+        $id_permission = self::get_permission();
+        $partner_permission_id = Qlib::qoption('partner_permission_id');
+        if($id_permission==$partner_permission_id){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
