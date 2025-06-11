@@ -915,7 +915,11 @@ class ClienteController extends Controller
         }
         $userLogadon = Auth::id();
         $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
-        $data['autor'] = isset($data['autor'])?$data['autor']:$userLogadon;
+        if(Qlib::is_partner_active()){
+            $data['autor'] = isset($data['autor'])?$data['autor']:0;
+        }else{
+            $data['autor'] = isset($data['autor'])?$data['autor']:$userLogadon;
+        }
         $data['preferencias']['newslatter'] = isset($data['preferencias']['newslatter'])?$data['preferencias']['newslatter']:'n';
         // $data['autor'] = $userLogadon;
         $dados_config = [];
