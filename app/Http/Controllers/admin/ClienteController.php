@@ -345,7 +345,7 @@ class ClienteController extends Controller
             //Libera essa opção se o parceiro estiver ativo
             if(Qlib::is_partner_active()){
                 $ret['autor'] = [
-                    'label'=>'Parceiro',
+                    'label'=>'Proprietário',
                     'active'=>true,
                     'type'=>'select',
                     // 'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s' AND id_permission='".Qlib::qoption('partner_permission_id')."'",'name','id'),'exibe_busca'=>'d-block',
