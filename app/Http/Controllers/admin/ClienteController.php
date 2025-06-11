@@ -349,7 +349,7 @@ class ClienteController extends Controller
                     'active'=>true,
                     'type'=>'select',
                     // 'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s' AND id_permission='".Qlib::qoption('partner_permission_id')."'",'name','id'),'exibe_busca'=>'d-block',
-                    'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s'",'name','id'),'exibe_busca'=>'d-block',
+                    'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s' AND id_permission!='1'",'name','id'),'exibe_busca'=>'d-block',
                     'event'=>'',
                     'tam'=>'12',
                     'class'=>'select2','class_div'=>' ',
