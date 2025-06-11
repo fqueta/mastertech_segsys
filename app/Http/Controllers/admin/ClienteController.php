@@ -342,15 +342,19 @@ class ClienteController extends Controller
                     $ret['config[status_contrato]']['event'] = '';
                 }
             }
-            $ret['autor'] = [
-                'label'=>'Parceiro',
-                'active'=>true,
-                'type'=>'select',
-                'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s' AND id_permission='".Qlib::qoption('partner_permission_id')."'",'name','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'tam'=>'12',
-                'class'=>'select2','class_div'=>' ',
-            ];
+            //Libera essa opção se o parceiro estiver ativo
+            if(Qlib::is_partner_active()){
+                $ret['autor'] = [
+                    'label'=>'Parceiro',
+                    'active'=>true,
+                    'type'=>'select',
+                    // 'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s' AND id_permission='".Qlib::qoption('partner_permission_id')."'",'name','id'),'exibe_busca'=>'d-block',
+                    'arr_opc'=>Qlib::sql_array("SELECT id,name FROM users WHERE ativo='s'",'name','id'),'exibe_busca'=>'d-block',
+                    'event'=>'',
+                    'tam'=>'12',
+                    'class'=>'select2','class_div'=>' ',
+                ];
+            }
         }
         //Reformular campos para parceiros
         if(Qlib::is_partner()){

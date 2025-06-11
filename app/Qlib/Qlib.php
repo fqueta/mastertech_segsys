@@ -1408,4 +1408,13 @@ class Qlib
             return false;
         }
     }
+    static function is_partner_active(){
+        $partner_permission_id = Qlib::qoption('partner_permission_id');
+        $active = self::buscaValorDb0('permissions','id',$partner_permission_id,'name'," AND active='s'");
+        if($active){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
