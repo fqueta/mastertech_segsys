@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\FinanceiroController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\admin\ImportController;
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\ClientesController;
 use App\Http\Controllers\api\SulAmericaController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\portal\sicController;
@@ -285,5 +286,11 @@ Route::name('api.')->prefix('api/v1')->middleware([
     // Route::resource('/contratacao', '\App\Http\Controllers\api\SulAmericaController', ['only' => ['index']]);
     // Route::get('/contratacao',[SulAmericaController::class,'contratacao'])->name('contataocao.sulamerica');
     // Route::resource('/documents', '\App\Http\Controllers\api\PostController', ['only' => ['index','show']]);
-
+    Route::post('/login',[AuthController::class,'login']);
+    // Route::middleware('auth:sanctum')->get('/user', [AuthController::class,'user']);
+    Route::middleware('auth:sanctum')->post('/clientes', [ClientesController::class,'store']);
+    Route::middleware('auth:sanctum')->put('/clientes/{cpf}', [ClientesController::class,'update']);
+    Route::middleware('auth:sanctum')->get('/clientes/{cpf}', [ClientesController::class,'show']);
+    Route::middleware('auth:sanctum')->delete('/clientes/{id}', [ClientesController::class,'destroy']);
+    Route::middleware('auth:sanctum')->post('/clientes-cancelar/{id}', [ClientesController::class,'cancelar_contrato']);
 });

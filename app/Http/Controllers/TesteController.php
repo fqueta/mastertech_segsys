@@ -44,6 +44,11 @@ class TesteController extends Controller
                 'fimVigencia'=>'2026-03-25',
             ];
             $ret = (new SulAmericaController)->contratacao($config);
+        }elseif($type==1){
+            $ret = Qlib::json_update_tab('users','id',45,'config',[
+                'bairro'=>'Teixeiras',
+                // 'fernando'=>'programador',
+            ]);
         }
         // if($type=='cancela'){
         //     $config = [
@@ -57,9 +62,9 @@ class TesteController extends Controller
         // $token = $request->get('token');
         // $ret = (new ContratoController)->status_update($token,'Reativando',[]);
         // // $ret = (new ContratoController)->update_token($token);
-        // return $ret;
+        return $ret;
 
-        return view('clientes.import');
+        // return view('clientes.import');
         // return view('teste',$config);
     }
     public function ajax(){

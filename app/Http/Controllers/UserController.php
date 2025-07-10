@@ -464,11 +464,12 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'name' => ['required','string',new FullName],
             'email' => ['required','string','unique:users'],
-            'cpf'   =>[new RightCpf]
+            'cpf'   =>[new RightCpf,'unique:users']
             ],[
                 'name.required'=>__('O nome é obrigatório'),
                 'name.string'=>__('É necessário conter letras no nome'),
                 'email.unique'=>__('E-mail já cadastrado'),
+                'cpf.unique'=>__('CPF já cadastrado'),
             ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';

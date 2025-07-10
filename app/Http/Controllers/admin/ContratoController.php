@@ -147,10 +147,16 @@ class ContratoController extends Controller
                 }
             }
             if(isset($ret['data'])){
-                $salvar_contrado = Qlib::update_tab('contratos',[
+                $ret['salvar_contrado'] = Qlib::update_tab('contratos',[
                     'config'=>Qlib::lib_array_json($ret['data']),
                 ],"WHERE token='$token_contrato'");
 
+            }else{
+                if(isset($id_cliente)){
+                    $ret['json_update_tab'] = Qlib::json_update_tab('users','id',$id_cliente,'config',[
+                           'status_contrato'=>$status,
+                    ]);
+                }
             }
             $ret['exec'] = true;
             $ret['mens'] = 'Status atualização com sucesso!';
@@ -209,6 +215,18 @@ class ContratoController extends Controller
         $contrato = Qlib::get_usermeta($id_cliente,$campo_meta1,true);
         $arr_contrato = Qlib::lib_json_array($contrato);
         $ret = isset($arr_contrato['data']['numCertificado']) ? $arr_contrato['data']['numCertificado']:0;
+        return $ret;
+    }
+    /**
+     * Canelar um contrato.
+     */
+    public function cancelar($numOperacao=false)
+    {
+        $ret = ['exec'=>false,'mens'=>'Erro ao cancelar'];
+        if($numOperacao){
+            $ret = (new sulAmericaController)->cancelamento(['numeroOperacao'=>$numOperacao]);
+        }
+
         return $ret;
     }
     /**

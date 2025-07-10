@@ -4,6 +4,9 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\admin\ContratoController;
+use App\Http\Requests\StoreClientesRequest;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdateClientesRequest;
 use App\Models\_upload;
 use App\Models\Contrato;
 use App\Models\User;
@@ -18,6 +21,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
+use Illuminate\Support\Facades\Validator;
+
 class ClienteController extends Controller
 {
     protected $user;
@@ -179,6 +184,12 @@ class ClienteController extends Controller
      */
     public function get_numero_operacao($id){
         return Qlib::get_usermeta($id,(new ContratoController)->campo_meta2,true);
+    }
+    /**
+     * Retorna o numero de operação
+     */
+    public function get_contrato_sulamerica($id){
+        return Qlib::get_usermeta($id,(new ContratoController)->campo_meta1,true);
     }
     // public function get_certificado($id_cliente=null,$json_contrato=null){
     //     if($id_cliente && !$json_contrato){
@@ -355,7 +366,12 @@ class ClienteController extends Controller
                     'class'=>'select2','class_div'=>' ',
                 ];
             }
+        }else{
+            if(Qlib::is_partner_active()){
+                $ret['autor']['value'] = Auth::id();
+            }
         }
+        // dd($ret);
         //Reformular campos para parceiros
         if(Qlib::is_partner()){
             $ret['config[id_produto]']['type'] = 'hidden';
@@ -571,19 +587,25 @@ class ClienteController extends Controller
             'value'=>$value,
         ]);
     }
-    public function store(Request $request)
+    public function store(StoreClientesRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => ['required','string',new FullName],
-            // 'email' => ['required','string','unique:users'],
-            'cpf'   =>[new RightCpf,'required','unique:users']
-            ],[
-                'name.required'=>__('O nome é obrigatório'),
-                'name.string'=>__('É necessário conter letras no nome'),
-                // 'email.unique'=>__('E-mail já cadastrado'),
-                'cpf.unique'=>__('CPF já cadastrado'),
-            ]);
+        // $validatedData = $request->validate([
+        //     'name' => ['required','string',new FullName],
+        //     // 'email' => ['required','string','unique:users'],
+        //     'cpf'   =>[new RightCpf,'required','unique:users']
+        //     ],[
+        //         'name.required'=>__('O nome é obrigatório'),
+        //         'name.string'=>__('É necessário conter letras no nome'),
+        //         // 'email.unique'=>__('E-mail já cadastrado'),
+        //         'cpf.unique'=>__('CPF já cadastrado'),
+        //     ]);
         $dados = $request->all();
+        return $this->salvar_clientes($dados);
+    }
+    /**
+     * Para salver os clientes no banco de dados
+     */
+    public function salvar_clientes($dados=[],$api=false){
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         $dados['autor'] = isset($dados['autor'])?$dados['autor']:Auth::id();
@@ -603,7 +625,6 @@ class ClienteController extends Controller
 
         $salvar = User::create($dados);
         $dados['id'] = $salvar->id;
-        $route = $this->routa.'.index';
         $ret = [
             'mens'=>$this->label.' cadastrada com sucesso!',
             'color'=>'success',
@@ -613,17 +634,27 @@ class ClienteController extends Controller
         ];
         //Adicionar um contrato caso o cliente foi salvo com sucesso
         if($ret['idCad'] && ($id_cliente = $ret['idCad']) && isset($dados['config']['id_produto'])){
-           $premioSeguro = Qlib::qoption('premioSeguro') ? Qlib::qoption('premioSeguro') : 3.96;
-           $dados['config']['token'] = isset($dados['token']) ? $dados['token'] : false;
-           $dados['config']['premioSeguro'] = $premioSeguro ? $premioSeguro : false;
-           $ret = $this->store_contratos($id_cliente,$dados['config']);
+            $premioSeguro = Qlib::qoption('premioSeguro') ? Qlib::qoption('premioSeguro') : 3.96;
+            $produtoParceiro = Qlib::qoption('produtoParceiro') ? Qlib::qoption('produtoParceiro') : 10232;
+            $dados['config']['token'] = isset($dados['token']) ? $dados['token'] : false;
+            $dados['config']['id_produto'] = isset($dados['id_produto']) ? $dados['id_produto'] : $produtoParceiro;
+            $dados['config']['premioSeguro'] = $premioSeguro ? $premioSeguro : false;
+            $dados['config']['nome_fantasia'] = isset($dados['nome_fantasia']) ? $dados['nome_fantasia'] : null;
+            $dados['config']['telefone_residencial'] = isset($dados['telefone_residencial']) ? $dados['telefone_residencial'] : null;
+            $dados['config']['telefone_comercial'] = isset($dados['telefone_comercial']) ? $dados['telefone_comercial'] : null;
+            $dados['config']['celular'] = isset($dados['celular']) ? $dados['celular'] : null;
+            $ret = $this->store_contratos($id_cliente,$dados['config']);
         }
-
+        if($api){
+            return response()->json($ret);
+        }
         if($ajax=='s'){
+            $route = $this->routa.'.index';
             $ret['return'] = route($route).'?idCad='.$salvar->id;
             $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
+            $route = $this->routa.'.index';
             return redirect()->route($route,$ret);
         }
     }
@@ -888,16 +919,24 @@ class ClienteController extends Controller
             return redirect()->route($routa.'.index',$ret);
         }
     }
-
-    public function update(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            // 'nome' => ['required',new FullName],
-            'name' => ['required',new FullName],
-            'cpf'   =>[new RightCpf]
-        ]);
-        $data = [];
+    /**
+     * Integrar ou conectar os dados que vem de um formulario com a função de salvamento no bando de daos
+     *
+     */
+    public function update(UpdateClientesRequest $request, $id){
+        // $validatedData = $request->validate([
+        //     'name' => ['required',new FullName],
+        //     'cpf'   =>[new RightCpf,'unique:users,cpf,'.$id],
+        // ]);
         $dados = $request->all();
+        return $this->atualizar_clientes($dados,$id);
+    }
+    /**
+     * Gerenciar a taulização dos cadastro do bando de dados
+     */
+    public function atualizar_clientes($dados,$id=null,$api=false)
+    {
+
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         foreach ($dados as $key => $value) {
             if($key!='_method'&&$key!='_token'&&$key!='ac'&&$key!='ajax'){
@@ -931,6 +970,8 @@ class ClienteController extends Controller
         if(empty($data['passaword'])){
             unset($data['passaword']);
         }
+        // dd($data,$id);
+        // return $id;
         if(!empty($data)){
             $atualizar=User::where('id',$id)->update($data);
             $route = $this->routa.'.index';
@@ -955,6 +996,9 @@ class ClienteController extends Controller
                 'color'=>'danger',
             ];
         }
+        if($api){
+            return response()->json($ret);
+        }
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$id;
             return response()->json($ret);
@@ -965,24 +1009,7 @@ class ClienteController extends Controller
 
     public function destroy($id,Request $request)
     {
-        // $config = $request->all();
-        // $ajax =  isset($config['ajax'])?$config['ajax']:'n';
-        // $routa = 'users';
-        // if (!$post = User::find($id)){
-        //     if($ajax=='s'){
-        //         $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
-        //     }else{
-        //         $ret = redirect()->route($routa.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
-        //     }
-        //     return $ret;
-        // }
 
-        // User::where('id',$id)->delete();
-        // if($ajax=='s'){
-        //     $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
-        // }else{
-        //     $ret = redirect()->route($routa.'.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
-        // }
         $ret = $this->delete_all($id);
         return $ret;
     }
@@ -1022,6 +1049,20 @@ class ClienteController extends Controller
                 'color'=>'danger',
             ];
             //throw $th;
+        }
+        return $ret;
+    }
+    /**
+     * Verificar se o Usuario informado pelo user_id é proprioetário do client_id
+     * @param string $user_id quando for null ele buscará o user_id logado no sistema
+     * @param string $client_id
+     */
+    public function is_owner($user_id=null,$client_id=null){
+        $user_id = $user_id ? $user_id : Auth::id();
+        // $client_id =
+        $ret = false;
+        if($user_id && $client_id){
+            $ret = Qlib::totalReg('users',"WHERE id='$client_id' AND autor='$user_id'");
         }
         return $ret;
     }

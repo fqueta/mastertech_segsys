@@ -30,6 +30,7 @@ class User extends Authenticatable
         'config',
         'preferencias',
         'ativo',
+        'autor',
     ];
 
     protected $hidden = [

@@ -1408,6 +1408,9 @@ class Qlib
             return false;
         }
     }
+    /**
+     * Verifica se um parceiro está ativo
+     */
     static function is_partner_active(){
         $partner_permission_id = Qlib::qoption('partner_permission_id');
         $active = self::buscaValorDb0('permissions','id',$partner_permission_id,'name'," AND active='s'");
@@ -1416,5 +1419,92 @@ class Qlib
         }else{
             return false;
         }
+    }
+    /**
+     * Atualiza um campo json em uma determinada tabela
+     * @param string $tab = Nome da tabela
+     * @param string $campo_bus = Campos de referencia para ser buscado do Ex: Id
+     * @param string $valor_bus = Valor de referencia para ser buscado do Ex: Id = 41
+     * @param string $campo_enc = Campo como valores json, para ser encontrado os dados do Ex: config
+     * @param array $data = dados a serem editados ou adicionados ao valor do campo config
+     * @param bool $insert_new = condição para inserir valor ao array salvo ou não true para sim e false para não
+     */
+    static function json_update_tab($tab,$campo_bus,$valor_bus,$campo_enc,$data=[],$insert_new=true){
+        $json = self::buscaValorDb0($tab,$campo_bus,$valor_bus,$campo_enc);
+        $ret['exec'] = false;
+        if(is_string($json)){
+            $arr_json = json_decode($json,true);
+            if(is_array($arr_json)){
+                foreach ($data as $k1 => $v1) {
+                    if(is_array($v1)){
+                        foreach ($v1 as $k2 => $v2) {
+                            # code...
+                        }
+                    }else{
+                        if(isset($arr_json[$k1])){
+                            $arr_json[$k1] = $v1;
+                        }else{
+                            if($insert_new){
+                                //adiciona novos valores
+                                $arr_json[$k1] = $v1;
+                            }
+                        }
+                    }
+                }
+                $ret['data'] = $arr_json;
+                $up = self::update_tab($tab,[$campo_enc=>Qlib::lib_array_json($arr_json)],"WHERE $campo_bus=$valor_bus");
+                if(self::isAdmin(1))
+                $ret['update'] = $up;
+                if($up['exec']){
+                    $ret['exec'] = $up['exec'];
+                    $ret['mens'] = isset($up['mens']) ? $up['mens'] : false;
+                }
+            }
+        }
+        return $ret;
+    }
+    /**
+     * Gera Array modificado baseando em campo json em uma determinada tabela
+     * @param string $tab = Nome da tabela
+     * @param string $campo_bus = Campos de referencia para ser buscado do Ex: Id
+     * @param string $valor_bus = Valor de referencia para ser buscado do Ex: Id = 41
+     * @param string $campo_enc = Campo como valores json, para ser encontrado os dados do Ex: config
+     * @param array $data = dados a serem editados ou adicionados ao valor do campo config
+     * @param bool $insert_new = condição para inserir valor ao array salvo ou não true para sim e false para não
+     */
+    static function json_generate_tab($tab,$campo_bus,$valor_bus,$campo_enc,$data=[],$insert_new=true){
+        $json = self::buscaValorDb0($tab,$campo_bus,$valor_bus,$campo_enc);
+        $ret['exec'] = false;
+        if(is_string($json)){
+            $arr_json = json_decode($json,true);
+            if(is_array($arr_json)){
+                foreach ($data as $k1 => $v1) {
+                    if(is_array($v1)){
+                        foreach ($v1 as $k2 => $v2) {
+                            # code...
+                        }
+                    }else{
+                        if(isset($arr_json[$k1])){
+                            $arr_json[$k1] = $v1;
+                        }else{
+                            if($insert_new){
+                                //adiciona novos valores
+                                $arr_json[$k1] = $v1;
+                            }
+                        }
+                    }
+                }
+                // $ret['data'] = $arr_json;
+                $ret = $arr_json;
+                // $up = self::update_tab($tab,[$campo_enc=>Qlib::lib_array_json($arr_json)],"WHERE $campo_bus=$valor_bus");
+                // if(self::isAdmin(1))
+                //     $ret['update'] = $up;
+                // if($up['exec']){
+                //     $ret['exec'] = $up['exec'];
+                //     $ret['mens'] = isset($up['mens']) ? $up['mens'] : false;
+                // }
+            }
+        }
+        return $ret;
     }
 }
