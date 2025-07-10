@@ -289,7 +289,8 @@ Route::name('api.')->prefix('api/v1')->middleware([
     Route::post('/login',[AuthController::class,'login']);
     // Route::middleware('auth:sanctum')->get('/user', [AuthController::class,'user']);
     Route::middleware('auth:sanctum')->post('/clientes', [ClientesController::class,'store']);
-    Route::middleware('auth:sanctum')->put('/clientes/{cpf}', [ClientesController::class,'update']);
+    Route::middleware('auth:sanctum')->post('/clientes-update/{cpf}', [ClientesController::class,'update']);
+    // Route::middleware('auth:sanctum')->put('/clientes/{cpf}', [ClientesController::class,'update']);
     Route::middleware('auth:sanctum')->get('/clientes/{cpf}', [ClientesController::class,'show']);
     Route::middleware('auth:sanctum')->delete('/clientes/{id}', [ClientesController::class,'destroy']);
     Route::middleware('auth:sanctum')->post('/clientes-cancelar/{id}', [ClientesController::class,'cancelar_contrato']);
