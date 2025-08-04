@@ -828,7 +828,7 @@ class ClienteController extends Controller
         $routa = $this->routa;//'users';
         $view = $this->view;//'users';
         // $this->authorize('is_admin', $user);
-         $this->authorize('is_user_back', $user);
+        $this->authorize('is_user_back', $user);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de users';

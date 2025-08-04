@@ -572,6 +572,9 @@ class UserController extends Controller
             if(isset($dados[0]['token'])){
                 $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
             }
+            if($this->routa=='pefil'){
+                $this->routa = 'perfil';
+            }
             $config = [
                 'ac'=>'alt',
                 'frm_id'=>'frm-users',
@@ -579,6 +582,7 @@ class UserController extends Controller
                 'url'=>$this->url,
                 'id'=>$id,
             ];
+            // dd($this->routa);
             $dcampo = $dados[0];
             $campos = $this->campos($dcampo,'show');
             $ret = [
@@ -653,7 +657,8 @@ class UserController extends Controller
         $dados = User::where('id',$id)->get();
         $routa = $this->routa;//'users';
         $view = $this->view;//'users';
-        $this->authorize('is_admin', $routa);
+        // $this->authorize('is_admin', $routa);
+        $this->authorize('is_user_back', $routa);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de users';
